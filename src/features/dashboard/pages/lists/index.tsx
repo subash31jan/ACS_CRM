@@ -25,11 +25,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import Link from "next/link";
+import { DynamicFormDialog } from "@/components/dynamic-form-dialog";
 
 export default function ListsPage() {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const columns = useListColumns();
 
     const table = useReactTable({
@@ -47,6 +48,11 @@ export default function ListsPage() {
         },
     });
 
+    const handleFormSubmit = (data: any) => {
+        console.log("List form submitted:", data);
+        // TODO: Add logic to save the list
+    };
+
     return (
         <div className="flex flex-col gap-4 p-8">
             <div className="flex items-center justify-between">
@@ -56,12 +62,10 @@ export default function ListsPage() {
                         Manage your contact lists and segments
                     </p>
                 </div>
-                <Link href="/dashboard/lists/new">
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create New List
-                    </Button>
-                </Link>
+                <Button onClick={() => setIsFormOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New List
+                </Button>
             </div>
 
             <div className="flex items-center gap-4">
@@ -125,6 +129,13 @@ export default function ListsPage() {
             </div>
 
             <ListTablePagination table={table} />
+
+            <DynamicFormDialog
+                open={isFormOpen}
+                onOpenChange={setIsFormOpen}
+                formType="list"
+                onSubmit={handleFormSubmit}
+            />
         </div>
     );
 }

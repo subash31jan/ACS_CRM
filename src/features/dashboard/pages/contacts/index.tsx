@@ -1,13 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useContacts } from "./hooks/use-contacts";
 import { ContactsTable } from "./components/contacts-table";
 import { ContactsFilters } from "./components/contacts-filters";
 import { Button } from "@/components/ui/button";
+import { DynamicFormDialog } from "@/components/dynamic-form-dialog";
 
 export function ContactsPage() {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const {
     contacts,
     allContacts,
@@ -23,17 +26,20 @@ export function ContactsPage() {
 
   const isEmpty = allContacts.length === 0;
 
+  const handleFormSubmit = (data: any) => {
+    console.log("Contact form submitted:", data);
+    // TODO: Add logic to save the contact
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/contacts/new">
-            <Button>
-              <Plus className="size-4" />
-              New Contact
-            </Button>
-          </Link>
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="size-4" />
+            New Contact
+          </Button>
         </div>
       </div>
 
@@ -68,6 +74,13 @@ export function ContactsPage() {
           </div>
         </div>
       )}
+
+      <DynamicFormDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        formType="contact"
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 } 

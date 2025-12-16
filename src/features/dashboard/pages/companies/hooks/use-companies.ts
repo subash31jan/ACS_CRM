@@ -22,7 +22,7 @@ export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesP
     });
 
     const [sorting, setSorting] = useState<SortingState>([
-        { id: "dateAdded", desc: true },
+        { id: "createdAt", desc: true },
     ]);
 
     const [pagination, setPagination] = useState<PaginationState>({
@@ -53,9 +53,9 @@ export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesP
                 }
             }
 
-            // Date range filter - using dateAdded for filtering
+            // Date range filter - using createdAt for filtering
             if (filters.dateRange.from || filters.dateRange.to) {
-                const companyAddedDate = new Date(company.dateAdded);
+                const companyAddedDate = new Date(company.createdAt);
                 if (filters.dateRange.from && companyAddedDate < filters.dateRange.from) {
                     return false;
                 }

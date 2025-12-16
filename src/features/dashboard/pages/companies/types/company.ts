@@ -9,8 +9,9 @@ export interface Company {
     industry: string;
     revenue: number;
     status: CompanyStatus;
-    dateAdded: string;
-    lastContact: string;
+    subscription: string;
+    createdAt: string;
+    updatedAt: string;
     location: string;
 }
 
