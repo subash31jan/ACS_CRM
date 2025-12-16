@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Company, CompanyFilters } from "@/features/dashboard/pages/companies/types/company";
 import { mockCompanies } from "../data/mock-companies";
 import {
@@ -6,12 +6,16 @@ import {
     PaginationState,
     OnChangeFn,
 } from "@tanstack/react-table";
+import { fetchCompanies, mapApiResponseToCompany } from "../services/company-api";
 
 interface UseCompaniesProps {
     initialCompanies?: Company[];
 }
 
-export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesProps = {}) {
+export function useCompanies({ initialCompanies }: UseCompaniesProps = {}) {
+    const [companies, setCompanies] = useState<Company[]>(initialCompanies || []);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [filters, setFilters] = useState<CompanyFilters>({
         status: "all",
         search: "",
@@ -30,8 +34,30 @@ export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesP
         pageSize: 10,
     });
 
+    // Fetch companies from API on mount
+    useEffect(() => {
+        const loadCompanies = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                const apiCompanies = await fetchCompanies();
+                const mappedCompanies = apiCompanies.map(mapApiResponseToCompany);
+                setCompanies(mappedCompanies);
+            } catch (err) {
+                console.error("Failed to fetch companies:", err);
+                setError(err instanceof Error ? err.message : "Failed to fetch companies");
+                // Fallback to mock data on error
+                setCompanies(mockCompanies);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadCompanies();
+    }, []);
+
     const filteredCompanies = useMemo(() => {
-        return initialCompanies.filter((company) => {
+        return companies.filter((company) => {
             // Status filter
             if (filters.status !== "all" && company.status !== filters.status) {
                 return false;
@@ -66,7 +92,7 @@ export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesP
 
             return true;
         });
-    }, [initialCompanies, filters]);
+    }, [companies, filters]);
 
     // For TanStack table, we need to handle pagination and sorting separately
     const paginatedAndSortedCompanies = useMemo(() => {
@@ -182,6 +208,8 @@ export function useCompanies({ initialCompanies = mockCompanies }: UseCompaniesP
         filters,
         sorting,
         pagination,
+        isLoading,
+        error,
         // Update handlers
         updateFilters,
         handleSortingChange,
