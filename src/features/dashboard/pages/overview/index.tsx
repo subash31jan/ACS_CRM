@@ -46,7 +46,7 @@ export function OverviewPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Customer Acquisition Cost
+              Contact Acquisition Cost
             </CardTitle>
             <DollarSign className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -63,7 +63,7 @@ export function OverviewPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Customer Lifetime Value
+              Contact Lifetime Value
             </CardTitle>
             <Heart className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -80,7 +80,7 @@ export function OverviewPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Customer Retention
+              Contact Retention
             </CardTitle>
             <Target className="text-muted-foreground h-4 w-4" />
           </CardHeader>
@@ -117,9 +117,9 @@ export function OverviewPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-1 md:col-span-2 lg:col-span-4">
           <CardHeader>
-            <CardTitle>Customer Journey Stages</CardTitle>
+            <CardTitle>Contact Journey Stages</CardTitle>
             <CardDescription>
-              Distribution of customers across sales funnel
+              Distribution of contacts across sales funnel
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2">
@@ -127,7 +127,7 @@ export function OverviewPage() {
               <div className="flex flex-col items-center gap-2">
                 <BarChart3 className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8" />
                 <p className="text-muted-foreground text-xs sm:text-sm">
-                  Customer funnel visualization
+                  Contact funnel visualization
                 </p>
                 <p className="text-muted-foreground text-[10px] sm:text-xs">
                   Awareness → Consideration → Decision → Loyalty
@@ -161,9 +161,9 @@ export function OverviewPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-1 md:col-span-1 lg:col-span-4">
           <CardHeader>
-            <CardTitle>Recent Customer Interactions</CardTitle>
+            <CardTitle>Recent Contact Interactions</CardTitle>
             <CardDescription>
-              Latest customer touchpoints and activities
+              Latest contact touchpoints and activities
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -241,9 +241,9 @@ export function OverviewPage() {
         </Card>
         <Card className="col-span-1 md:col-span-1 lg:col-span-3">
           <CardHeader>
-            <CardTitle>Customer Engagement</CardTitle>
+            <CardTitle>Contact Engagement</CardTitle>
             <CardDescription>
-              Activity metrics across customer touchpoints
+              Activity metrics across contact touchpoints
             </CardDescription>
           </CardHeader>
           <CardContent>
