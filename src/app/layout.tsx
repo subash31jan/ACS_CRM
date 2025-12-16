@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 export const metadata: Metadata = {
-  title: "Piper - Customer Relationship Management",
+  title: "ACS CRM",
   description:
     "CRM dashboard for managing customer relationships using Next.js, Shadcn UI",
 };

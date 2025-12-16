@@ -11,6 +11,7 @@ import {
   Map,
   HandCoins,
   ShoppingCart,
+  Building2,
 } from "lucide-react";
 
 export const sidebarMenus = {
@@ -51,10 +52,110 @@ export const sidebarMenus = {
         },
         {
           title: "Import/Export",
-          url: "/dashboard/contacts/import-export",
+          url: "/dashboard/customers/import-export",
         },
       ],
     },
+    {
+      title: "Companies",
+      url: "/dashboard/companies",
+      icon: Building2,
+      items: [
+        {
+          title: "All Companies",
+          url: "/dashboard/companies",
+        },
+        {
+          title: "Segments",
+          url: "/dashboard/companies/segments",
+        },
+        {
+          title: "Import/Export",
+          url: "/dashboard/companies/import-export",
+        },
+      ],
+    },
+    // {
+    //   title: "Orders",
+    //   url: "/dashboard/orders",
+    //   icon: ShoppingCart,
+    //   items: [
+    //     {
+    //       title: "All Orders",
+    //       url: "/dashboard/orders",
+    //     },
+    //     {
+    //       title: "Pending Orders",
+    //       url: "/dashboard/orders/pending",
+    //     },
+    //     {
+    //       title: "Completed Orders",
+    //       url: "/dashboard/orders/completed",
+    //     },
+    //   ],
+    // },
+
+    // {
+    //   title: "Invoices",
+    //   url: "/dashboard/invoices",
+    //   icon: FileText,
+    //   items: [
+    //     {
+    //       title: "All Invoices",
+    //       url: "/dashboard/invoices",
+    //     },
+    //     {
+    //       title: "Pending",
+    //       url: "/dashboard/invoices/pending",
+    //     },
+    //     {
+    //       title: "Paid",
+    //       url: "/dashboard/invoices/paid",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Reports",
+    //   url: "/dashboard/reports/sales",
+    //   icon: BarChart,
+    //   items: [
+    //     {
+    //       title: "Sales Report",
+    //       url: "/dashboard/reports/sales",
+    //     },
+    //     {
+    //       title: "Customer Insights",
+    //       url: "/dashboard/reports/customer-insights",
+    //     },
+    //     {
+    //       title: "Revenue",
+    //       url: "/dashboard/reports/revenue",
+    //     },
+    //   ],
+    // },
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings/general",
+    //   icon: Settings2,
+    //   items: [
+    //     {
+    //       title: "General",
+    //       url: "/dashboard/settings/general",
+    //     },
+    //     {
+    //       title: "Users & Permissions",
+    //       url: "/dashboard/settings/users",
+    //     },
+    //     {
+    //       title: "Integrations",
+    //       url: "/dashboard/settings/integrations",
+    //     },
+    //     {
+    //       title: "API Settings",
+    //       url: "/dashboard/settings/api",
+    //     },
+    //   ],
+    // },
   ],
   navSecondary: [],
   workspaces: [],
