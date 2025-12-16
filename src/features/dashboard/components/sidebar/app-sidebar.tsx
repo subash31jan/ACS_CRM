@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={sidebarMenus.navMain} />
-        <NavWorkspace workspaces={sidebarMenus.workspaces} />
+        {/* <NavWorkspace workspaces={sidebarMenus.workspaces} /> */}
         <NavSecondary items={sidebarMenus.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
