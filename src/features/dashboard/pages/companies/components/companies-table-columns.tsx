@@ -44,45 +44,28 @@ export const useCompanyColumns = () => {
                 ),
             },
             {
-                accessorKey: "industry",
-                header: "Industry",
-                cell: ({ row }) => <div>{row.getValue("industry")}</div>,
-            },
-            {
-                accessorKey: "dateAdded",
-                header: "Date Added",
-                cell: ({ row }) => format(new Date(row.getValue("dateAdded")), "PP"),
-            },
-            {
-                accessorKey: "revenue",
-                header: "Revenue",
-                cell: ({ row }) => formatCurrency(row.getValue("revenue")),
-            },
-            {
-                accessorKey: "lastContact",
-                header: "Last Contact",
-                cell: ({ row }) => {
-                    const lastContact = row.getValue("lastContact") as string;
-                    return lastContact
-                        ? format(new Date(lastContact), "PP")
-                        : "No contact yet";
-                },
-            },
-            {
                 accessorKey: "location",
                 header: "Location",
                 cell: ({ row }) => <div>{row.getValue("location")}</div>,
             },
             {
-                accessorKey: "status",
-                header: "Status",
+                accessorKey: "subscription",
+                header: "Subscription",
+                cell: ({ row }) => <div>{row.getValue("subscription")}</div>,
+            },
+            {
+                accessorKey: "createdAt",
+                header: "Created At",
+                cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PP"),
+            },
+            {
+                accessorKey: "updatedAt",
+                header: "Updated At",
                 cell: ({ row }) => {
-                    const status = row.getValue("status") as CompanyStatus;
-                    return (
-                        <Badge className={statusColors[status]}>
-                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                        </Badge>
-                    );
+                    const updatedAt = row.getValue("updatedAt") as string;
+                    return updatedAt
+                        ? format(new Date(updatedAt), "PP")
+                        : "Never";
                 },
             },
             {
