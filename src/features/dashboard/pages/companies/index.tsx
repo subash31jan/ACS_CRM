@@ -36,6 +36,8 @@ export function CompaniesPage() {
         filters,
         sorting,
         pagination,
+        isLoading,
+        error,
         updateFilters,
         handleSortingChange,
         handlePaginationChange,
@@ -119,6 +121,22 @@ export function CompaniesPage() {
                     <CompaniesFilters filters={filters} onFiltersChange={updateFilters} />
                 </div>
                 <div className="p-3">
+                    {isLoading ? (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                                <p className="text-sm text-muted-foreground">Loading companies...</p>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <div className="flex items-center justify-center py-12">
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <p className="text-sm font-medium text-destructive">Failed to load companies</p>
+                                <p className="text-xs text-muted-foreground">{error}</p>
+                                <p className="text-xs text-muted-foreground">Showing mock data as fallback</p>
+                            </div>
+                        </div>
+                    ) : null}
                     <CompaniesTable
                         companies={companies}
                         totalRows={allCompanies.length}
