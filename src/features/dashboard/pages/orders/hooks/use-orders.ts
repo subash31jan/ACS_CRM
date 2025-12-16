@@ -42,7 +42,7 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
         const searchLower = filters.search.toLowerCase();
         const searchableFields = [
           order.orderNumber,
-          order.customerName,
+          order.contactName,
           order.email,
         ].map((field) => field.toLowerCase());
 
