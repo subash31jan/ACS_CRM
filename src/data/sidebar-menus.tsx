@@ -12,6 +12,7 @@ import {
   HandCoins,
   ShoppingCart,
   Building2,
+  List,
 } from "lucide-react";
 
 export const sidebarMenus = {
@@ -47,10 +48,6 @@ export const sidebarMenus = {
           url: "/dashboard/contacts",
         },
         {
-          title: "Segments",
-          url: "/dashboard/contacts/segments",
-        },
-        {
           title: "Import/Export",
           url: "/dashboard/customers/import-export",
         },
@@ -66,12 +63,23 @@ export const sidebarMenus = {
           url: "/dashboard/companies",
         },
         {
-          title: "Segments",
-          url: "/dashboard/companies/segments",
+          title: "Import/Export",
+          url: "/dashboard/companies/import-export",
+        },
+      ],
+    },
+    {
+      title: "Lists",
+      url: "/dashboard/lists",
+      icon: List,
+      items: [
+        {
+          title: "All Lists",
+          url: "/dashboard/lists",
         },
         {
           title: "Import/Export",
-          url: "/dashboard/companies/import-export",
+          url: "/dashboard/lists/import-export",
         },
       ],
     },
