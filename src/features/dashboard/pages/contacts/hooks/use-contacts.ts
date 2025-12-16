@@ -1,18 +1,18 @@
 import { useState, useMemo } from "react";
-import { Invoice, InvoiceFilters } from "@/features/dashboard/pages/invoices/types/invoice";
-import { mockInvoices } from "../data/mock-invoices";
+import { Contact, ContactFilters } from "@/features/dashboard/pages/contacts/types/contact";
+import { mockContacts } from "../data/mock-contacts";
 import {
   SortingState,
   PaginationState,
   OnChangeFn,
 } from "@tanstack/react-table";
 
-interface UseInvoicesProps {
-  initialInvoices?: Invoice[];
+interface UseContactsProps {
+  initialContacts?: Contact[];
 }
 
-export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps = {}) {
-  const [filters, setFilters] = useState<InvoiceFilters>({
+export function useContacts({ initialContacts = mockContacts }: UseContactsProps = {}) {
+  const [filters, setFilters] = useState<ContactFilters>({
     status: "all",
     search: "",
     dateRange: {
@@ -22,7 +22,7 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
   });
 
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "date", desc: true },
+    { id: "dateJoined", desc: true },
   ]);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -30,10 +30,10 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
     pageSize: 10,
   });
 
-  const filteredInvoices = useMemo(() => {
-    return initialInvoices.filter((invoice) => {
+  const filteredContacts = useMemo(() => {
+    return initialContacts.filter((contact) => {
       // Status filter
-      if (filters.status !== "all" && invoice.status !== filters.status) {
+      if (filters.status !== "all" && contact.status !== filters.status) {
         return false;
       }
 
@@ -41,9 +41,11 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const searchableFields = [
-          invoice.invoiceNumber,
-          invoice.contactName,
-          invoice.email,
+          contact.contactNumber,
+          contact.fullName,
+          contact.email,
+          contact.company,
+          contact.location,
         ].map((field) => field.toLowerCase());
 
         if (!searchableFields.some((field) => field.includes(searchLower))) {
@@ -51,32 +53,32 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
         }
       }
 
-      // Date range filter
+      // Date range filter - using dateJoined for filtering
       if (filters.dateRange.from || filters.dateRange.to) {
-        const invoiceDate = new Date(invoice.date);
-        if (filters.dateRange.from && invoiceDate < filters.dateRange.from) {
+        const contactJoinDate = new Date(contact.dateJoined);
+        if (filters.dateRange.from && contactJoinDate < filters.dateRange.from) {
           return false;
         }
-        if (filters.dateRange.to && invoiceDate > filters.dateRange.to) {
+        if (filters.dateRange.to && contactJoinDate > filters.dateRange.to) {
           return false;
         }
       }
 
       return true;
     });
-  }, [initialInvoices, filters]);
+  }, [initialContacts, filters]);
 
   // For TanStack table, we need to handle pagination and sorting separately
-  const paginatedAndSortedInvoices = useMemo(() => {
+  const paginatedAndSortedContacts = useMemo(() => {
     // Early return if no filters
-    if (filteredInvoices.length === 0) return [];
+    if (filteredContacts.length === 0) return [];
 
     // Skip sorting if no sort criteria
     if (sorting.length === 0) {
       // Just apply pagination
       const startIdx = pagination.pageIndex * pagination.pageSize;
       const endIdx = startIdx + pagination.pageSize;
-      return filteredInvoices.slice(startIdx, endIdx);
+      return filteredContacts.slice(startIdx, endIdx);
     }
 
     // Create a sorting function that makes comparisons based on field type
@@ -120,10 +122,10 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
     };
 
     // Apply sorting
-    const sortedInvoices = [...filteredInvoices].sort((a, b) => {
+    const sortedContacts = [...filteredContacts].sort((a, b) => {
       // Handle multi-sorting using sortingState array
       for (const sort of sorting) {
-        const key = sort.id as keyof Invoice;
+        const key = sort.id as keyof Contact;
         const compared = compareValues(a[key], b[key], sort.desc);
         if (compared !== 0) return compared;
       }
@@ -133,10 +135,10 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
     // Apply pagination
     const startIdx = pagination.pageIndex * pagination.pageSize;
     const endIdx = startIdx + pagination.pageSize;
-    return sortedInvoices.slice(startIdx, endIdx);
-  }, [filteredInvoices, sorting, pagination]);
+    return sortedContacts.slice(startIdx, endIdx);
+  }, [filteredContacts, sorting, pagination]);
 
-  const updateFilters = (newFilters: Partial<InvoiceFilters>) => {
+  const updateFilters = (newFilters: Partial<ContactFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     // Reset to first page when filters change
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -170,12 +172,12 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
   };
 
   return {
-    // Raw filtered invoices (no pagination applied)
-    allInvoices: filteredInvoices,
-    // Invoices with pagination and sorting applied
-    invoices: paginatedAndSortedInvoices,
+    // Raw filtered contacts (no pagination applied)
+    allContacts: filteredContacts,
+    // Contacts with pagination and sorting applied
+    contacts: paginatedAndSortedContacts,
     // Total count for pagination
-    pageCount: Math.ceil(filteredInvoices.length / pagination.pageSize),
+    pageCount: Math.ceil(filteredContacts.length / pagination.pageSize),
     // States
     filters,
     sorting,
