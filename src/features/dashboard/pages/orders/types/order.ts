@@ -3,7 +3,7 @@ export type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled';
 export interface Order {
   id: string;
   orderNumber: string;
-  contactName: string;
+  customerName: string;
   email: string;
   amount: number;
   status: OrderStatus;

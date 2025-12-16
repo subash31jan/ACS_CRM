@@ -188,7 +188,7 @@ const activityLogsMockData: ActivityLog[] = [
   {
     id: "18",
     type: "contact",
-    description: "Contact relationship established (last year)",
+    description: "Customer relationship established (last year)",
     user: "Emily Johnson",
     entity: "Quantum Innovations",
     timestamp: new Date(new Date().getFullYear() - 1, 5, 15).toISOString(), // Last year, June 15

@@ -4,7 +4,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "e1b2c611-0627-8369-2f3c-i9i0152c8efg",
     invoiceNumber: "INV-2025-005",
-    contactName: "David Lee",
+    customerName: "David Lee",
     email: "david.lee@email.com",
     amount: 75.5,
     status: "paid",
@@ -16,7 +16,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "f2c3d712-1738-9470-3a4d-j0j1263d9fgh",
     invoiceNumber: "INV-2025-006",
-    contactName: "Jennifer Garcia",
+    customerName: "Jennifer Garcia",
     email: "jen.garcia@example.com",
     amount: 189.95,
     status: "paid",
@@ -28,7 +28,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "g3d4e813-2849-0581-4b5e-k1k2374e0ghi",
     invoiceNumber: "INV-2025-007",
-    contactName: "Robert Martinez",
+    customerName: "Robert Martinez",
     email: "r.martinez@example.org",
     amount: 429.99,
     status: "pending",
@@ -40,7 +40,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "h4e5f914-3950-1692-5c6f-l2l3485f1hij",
     invoiceNumber: "INV-2025-008",
-    contactName: "Lisa Thompson",
+    customerName: "Lisa Thompson",
     email: "lisa.t@example.net",
     amount: 67.25,
     status: "draft",
@@ -52,7 +52,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "i5f6g015-4061-2703-6d7g-m3m4596g2ijk",
     invoiceNumber: "INV-2025-009",
-    contactName: "James Wilson",
+    customerName: "James Wilson",
     email: "jwilson@example.com",
     amount: 1299.0,
     status: "paid",
@@ -64,7 +64,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "j6g7h116-5172-3814-7e8h-n4n5607h3jkl",
     invoiceNumber: "INV-2025-010",
-    contactName: "Patricia Anderson",
+    customerName: "Patricia Anderson",
     email: "p.anderson@example.org",
     amount: 349.5,
     status: "cancelled",
@@ -76,7 +76,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "k7h8i217-6283-4925-8f9i-o5o6718i4klm",
     invoiceNumber: "INV-2025-011",
-    contactName: "Thomas Moore",
+    customerName: "Thomas Moore",
     email: "t.moore@example.net",
     amount: 129.99,
     status: "pending",
@@ -88,7 +88,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "l8i9j318-7394-5036-9g0j-p6p7829j5lmn",
     invoiceNumber: "INV-2025-012",
-    contactName: "Jessica Taylor",
+    customerName: "Jessica Taylor",
     email: "jessica.t@example.com",
     amount: 219.95,
     status: "paid",
@@ -100,7 +100,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "m9j0k419-8405-6147-0h1k-q7q8930k6mno",
     invoiceNumber: "INV-2025-013",
-    contactName: "Daniel Johnson",
+    customerName: "Daniel Johnson",
     email: "dan.j@example.org",
     amount: 549.0,
     status: "draft",
@@ -112,7 +112,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "n0k1l520-9516-7258-1i2l-r8r9041l7nop",
     invoiceNumber: "INV-2025-014",
-    contactName: "Elizabeth Clark",
+    customerName: "Elizabeth Clark",
     email: "e.clark@example.net",
     amount: 749.99,
     status: "paid",
@@ -124,7 +124,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "o1l2m621-0627-8369-2j3m-s9s0152m8opq",
     invoiceNumber: "INV-2025-015",
-    contactName: "Christopher Lewis",
+    customerName: "Christopher Lewis",
     email: "c.lewis@example.com",
     amount: 89.5,
     status: "paid",
@@ -136,7 +136,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "p2m3n722-1738-9470-3k4n-t0t1263n9pqr",
     invoiceNumber: "INV-2025-016",
-    contactName: "Michelle Walker",
+    customerName: "Michelle Walker",
     email: "michelle.w@example.org",
     amount: 399.95,
     status: "pending",
@@ -148,7 +148,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "q3n4o823-2849-0581-4l5o-u1u2374o0qrs",
     invoiceNumber: "INV-2025-017",
-    contactName: "David Hall",
+    customerName: "David Hall",
     email: "dhall@example.net",
     amount: 179.99,
     status: "paid",
@@ -160,7 +160,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "r4o5p924-3950-1692-5m6p-v2v3485p1rst",
     invoiceNumber: "INV-2025-018",
-    contactName: "Kimberly Adams",
+    customerName: "Kimberly Adams",
     email: "k.adams@example.com",
     amount: 129.5,
     status: "draft",
@@ -172,7 +172,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "s5p6q025-4061-2703-6n7q-w3w4596q2stu",
     invoiceNumber: "INV-2025-019",
-    contactName: "Richard White",
+    customerName: "Richard White",
     email: "r.white@example.org",
     amount: 899.99,
     status: "paid",
@@ -184,7 +184,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "t6q7r126-5172-3814-7o8r-x4x5607r3tuv",
     invoiceNumber: "INV-2025-020",
-    contactName: "Susan Harris",
+    customerName: "Susan Harris",
     email: "s.harris@example.net",
     amount: 45.75,
     status: "cancelled",
@@ -196,7 +196,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "u7r8s227-6283-4925-8p9s-y5y6718s4uvw",
     invoiceNumber: "INV-2025-021",
-    contactName: "Joseph Martin",
+    customerName: "Joseph Martin",
     email: "j.martin@example.com",
     amount: 349.9,
     status: "pending",
@@ -208,7 +208,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "v8s9t328-7394-5036-9q0t-z6z7829t5vwx",
     invoiceNumber: "INV-2025-022",
-    contactName: "Nancy Thompson",
+    customerName: "Nancy Thompson",
     email: "nancy.t@example.org",
     amount: 279.95,
     status: "paid",
@@ -220,7 +220,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "w9t0u429-8405-6147-0r1u-a7a8930u6wxy",
     invoiceNumber: "INV-2025-023",
-    contactName: "Charles Wilson",
+    customerName: "Charles Wilson",
     email: "c.wilson@example.net",
     amount: 149.5,
     status: "draft",
@@ -232,7 +232,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "x0u1v530-9516-7258-1s2v-b8b9041v7xyz",
     invoiceNumber: "INV-2025-024",
-    contactName: "Margaret Jackson",
+    customerName: "Margaret Jackson",
     email: "m.jackson@example.com",
     amount: 999.0,
     status: "paid",
@@ -244,7 +244,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "y1v2w631-0627-8369-2t3w-c9c0152w8yza",
     invoiceNumber: "INV-2025-025",
-    contactName: "Ryan Miller",
+    customerName: "Ryan Miller",
     email: "r.miller@example.org",
     amount: 59.99,
     status: "cancelled",
@@ -256,7 +256,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "z2w3x732-1738-9470-3u4x-d0d1263x9zab",
     invoiceNumber: "INV-2025-026",
-    contactName: "Amanda Moore",
+    customerName: "Amanda Moore",
     email: "a.moore@example.net",
     amount: 449.95,
     status: "pending",
@@ -268,7 +268,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "a3x4y833-2849-0581-4v5y-e1e2374y0abc",
     invoiceNumber: "INV-2025-027",
-    contactName: "Kevin Davis",
+    customerName: "Kevin Davis",
     email: "kevin.d@example.com",
     amount: 225.5,
     status: "paid",
@@ -280,7 +280,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "b4y5z934-3950-1692-5w6z-f2f3485z1bcd",
     invoiceNumber: "INV-2025-028",
-    contactName: "Laura Taylor",
+    customerName: "Laura Taylor",
     email: "l.taylor@example.org",
     amount: 179.99,
     status: "draft",
@@ -292,7 +292,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "c5z6a035-4061-2703-6x7a-g3g4596a2cde",
     invoiceNumber: "INV-2025-029",
-    contactName: "Scott Brown",
+    customerName: "Scott Brown",
     email: "s.brown@example.net",
     amount: 799.0,
     status: "paid",
@@ -304,7 +304,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "d6a7b136-5172-3814-7y8b-h4h5607b3def",
     invoiceNumber: "INV-2025-030",
-    contactName: "Stephanie Wilson",
+    customerName: "Stephanie Wilson",
     email: "s.wilson@example.com",
     amount: 84.5,
     status: "cancelled",
@@ -316,7 +316,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "e7b8c237-6283-4925-8z9c-i5i6718c4efg",
     invoiceNumber: "INV-2025-031",
-    contactName: "Jeffrey Martinez",
+    customerName: "Jeffrey Martinez",
     email: "j.martinez@example.org",
     amount: 329.99,
     status: "pending",
@@ -328,7 +328,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "f8c9d338-7394-5036-9a0d-j6j7829d5fgh",
     invoiceNumber: "INV-2025-032",
-    contactName: "Rebecca Thompson",
+    customerName: "Rebecca Thompson",
     email: "r.thompson@example.net",
     amount: 269.95,
     status: "paid",
@@ -340,7 +340,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "g9d0e439-8405-6147-0b1e-k7k8930e6ghi",
     invoiceNumber: "INV-2025-033",
-    contactName: "Gary Nelson",
+    customerName: "Gary Nelson",
     email: "g.nelson@example.com",
     amount: 159.5,
     status: "draft",
@@ -352,7 +352,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "h0e1f540-9516-7258-1c2f-l8l9041f7hij",
     invoiceNumber: "INV-2025-034",
-    contactName: "Helen Carter",
+    customerName: "Helen Carter",
     email: "h.carter@example.org",
     amount: 1249.0,
     status: "paid",
@@ -364,7 +364,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "i1f2g641-0627-8369-2d3g-m9m0152g8ijk",
     invoiceNumber: "INV-2025-035",
-    contactName: "Jason Phillips",
+    customerName: "Jason Phillips",
     email: "j.phillips@example.net",
     amount: 64.99,
     status: "cancelled",
@@ -376,7 +376,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "j2g3h742-1738-9470-3e4h-n0n1263h9jkl",
     invoiceNumber: "INV-2025-036",
-    contactName: "Maria Rodriguez",
+    customerName: "Maria Rodriguez",
     email: "m.rodriguez@example.com",
     amount: 419.95,
     status: "pending",
@@ -388,7 +388,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "k3h4i843-2849-0581-4f5i-o1o2374i0klm",
     invoiceNumber: "INV-2025-037",
-    contactName: "Joshua Hill",
+    customerName: "Joshua Hill",
     email: "j.hill@example.org",
     amount: 279.5,
     status: "paid",
@@ -400,7 +400,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "l4i5j944-3950-1692-5g6j-p2p3485j1lmn",
     invoiceNumber: "INV-2025-038",
-    contactName: "Melissa Wilson",
+    customerName: "Melissa Wilson",
     email: "m.wilson@example.net",
     amount: 159.99,
     status: "draft",
@@ -412,7 +412,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "m5j6k045-4061-2703-6h7k-q3q4596k2mno",
     invoiceNumber: "INV-2025-039",
-    contactName: "Timothy Baker",
+    customerName: "Timothy Baker",
     email: "t.baker@example.com",
     amount: 849.0,
     status: "paid",
@@ -424,7 +424,7 @@ export const mockInvoices: Invoice[] = [
   {
     id: "n6k7l146-5172-3814-7i8l-r4r5607l3nop",
     invoiceNumber: "INV-2025-040",
-    contactName: "Nicole Green",
+    customerName: "Nicole Green",
     email: "n.green@example.org",
     amount: 79.5,
     status: "cancelled",

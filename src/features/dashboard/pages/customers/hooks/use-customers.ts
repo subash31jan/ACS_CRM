@@ -1,18 +1,18 @@
 import { useState, useMemo } from "react";
-import { Order, OrderFilters } from "@/features/dashboard/pages/orders/types/order";
-import { mockOrders } from "../data/mock-orders";
+import { Customer, CustomerFilters } from "@/features/dashboard/pages/customers/types/customer";
+import { mockCustomers } from "../data/mock-customers";
 import {
   SortingState,
   PaginationState,
   OnChangeFn,
 } from "@tanstack/react-table";
 
-interface UseOrdersProps {
-  initialOrders?: Order[];
+interface UseCustomersProps {
+  initialCustomers?: Customer[];
 }
 
-export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
-  const [filters, setFilters] = useState<OrderFilters>({
+export function useCustomers({ initialCustomers = mockCustomers }: UseCustomersProps = {}) {
+  const [filters, setFilters] = useState<CustomerFilters>({
     status: "all",
     search: "",
     dateRange: {
@@ -22,7 +22,7 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
   });
 
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "date", desc: true },
+    { id: "dateJoined", desc: true },
   ]);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -30,10 +30,10 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
     pageSize: 10,
   });
 
-  const filteredOrders = useMemo(() => {
-    return initialOrders.filter((order) => {
+  const filteredCustomers = useMemo(() => {
+    return initialCustomers.filter((customer) => {
       // Status filter
-      if (filters.status !== "all" && order.status !== filters.status) {
+      if (filters.status !== "all" && customer.status !== filters.status) {
         return false;
       }
 
@@ -41,9 +41,11 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const searchableFields = [
-          order.orderNumber,
-          order.customerName,
-          order.email,
+          customer.customerNumber,
+          customer.fullName,
+          customer.email,
+          customer.company,
+          customer.location,
         ].map((field) => field.toLowerCase());
 
         if (!searchableFields.some((field) => field.includes(searchLower))) {
@@ -51,32 +53,32 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
         }
       }
 
-      // Date range filter
+      // Date range filter - using dateJoined for filtering
       if (filters.dateRange.from || filters.dateRange.to) {
-        const orderDate = new Date(order.date);
-        if (filters.dateRange.from && orderDate < filters.dateRange.from) {
+        const customerJoinDate = new Date(customer.dateJoined);
+        if (filters.dateRange.from && customerJoinDate < filters.dateRange.from) {
           return false;
         }
-        if (filters.dateRange.to && orderDate > filters.dateRange.to) {
+        if (filters.dateRange.to && customerJoinDate > filters.dateRange.to) {
           return false;
         }
       }
 
       return true;
     });
-  }, [initialOrders, filters]);
+  }, [initialCustomers, filters]);
 
   // For TanStack table, we need to handle pagination and sorting separately
-  const paginatedAndSortedOrders = useMemo(() => {
+  const paginatedAndSortedCustomers = useMemo(() => {
     // Early return if no filters
-    if (filteredOrders.length === 0) return [];
+    if (filteredCustomers.length === 0) return [];
 
     // Skip sorting if no sort criteria
     if (sorting.length === 0) {
       // Just apply pagination
       const startIdx = pagination.pageIndex * pagination.pageSize;
       const endIdx = startIdx + pagination.pageSize;
-      return filteredOrders.slice(startIdx, endIdx);
+      return filteredCustomers.slice(startIdx, endIdx);
     }
 
     // Create a sorting function that makes comparisons based on field type
@@ -120,10 +122,10 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
     };
 
     // Apply sorting
-    const sortedOrders = [...filteredOrders].sort((a, b) => {
+    const sortedCustomers = [...filteredCustomers].sort((a, b) => {
       // Handle multi-sorting using sortingState array
       for (const sort of sorting) {
-        const key = sort.id as keyof Order;
+        const key = sort.id as keyof Customer;
         const compared = compareValues(a[key], b[key], sort.desc);
         if (compared !== 0) return compared;
       }
@@ -133,10 +135,10 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
     // Apply pagination
     const startIdx = pagination.pageIndex * pagination.pageSize;
     const endIdx = startIdx + pagination.pageSize;
-    return sortedOrders.slice(startIdx, endIdx);
-  }, [filteredOrders, sorting, pagination]);
+    return sortedCustomers.slice(startIdx, endIdx);
+  }, [filteredCustomers, sorting, pagination]);
 
-  const updateFilters = (newFilters: Partial<OrderFilters>) => {
+  const updateFilters = (newFilters: Partial<CustomerFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     // Reset to first page when filters change
     setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -170,12 +172,12 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
   };
 
   return {
-    // Raw filtered orders (no pagination applied)
-    allOrders: filteredOrders,
-    // Orders with pagination and sorting applied
-    orders: paginatedAndSortedOrders,
+    // Raw filtered customers (no pagination applied)
+    allCustomers: filteredCustomers,
+    // Customers with pagination and sorting applied
+    customers: paginatedAndSortedCustomers,
     // Total count for pagination
-    pageCount: Math.ceil(filteredOrders.length / pagination.pageSize),
+    pageCount: Math.ceil(filteredCustomers.length / pagination.pageSize),
     // States
     filters,
     sorting,
@@ -186,4 +188,4 @@ export function useOrders({ initialOrders = mockOrders }: UseOrdersProps = {}) {
     handlePaginationChange,
     handleClearFilters,
   };
-}
+} 

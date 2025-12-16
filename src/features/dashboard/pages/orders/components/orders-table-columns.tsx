@@ -32,11 +32,11 @@ export const useOrderColumns = () => {
         ),
       },
       {
-        accessorKey: "contactName",
-        header: "Contact",
+        accessorKey: "customerName",
+        header: "Customer",
         cell: ({ row }) => (
           <div className="flex flex-col">
-            <span>{row.getValue("contactName")}</span>
+            <span>{row.getValue("customerName")}</span>
             <span className="text-sm text-muted-foreground">
               {row.original.email}
             </span>

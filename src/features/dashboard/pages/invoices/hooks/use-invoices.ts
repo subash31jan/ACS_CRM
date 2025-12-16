@@ -42,7 +42,7 @@ export function useInvoices({ initialInvoices = mockInvoices }: UseInvoicesProps
         const searchLower = filters.search.toLowerCase();
         const searchableFields = [
           invoice.invoiceNumber,
-          invoice.contactName,
+          invoice.customerName,
           invoice.email,
         ].map((field) => field.toLowerCase());
 

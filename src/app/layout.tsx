@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${GeistMono.className} antialiased`} suppressHydrationWarning>
+      <body className={`${GeistMono.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

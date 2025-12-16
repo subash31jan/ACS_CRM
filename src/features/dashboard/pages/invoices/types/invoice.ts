@@ -3,7 +3,7 @@ export type InvoiceStatus = 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelle
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  contactName: string;
+  customerName: string;
   email: string;
   amount: number;
   status: InvoiceStatus;
