@@ -51,3 +51,26 @@ export function mapApiResponseToCompany(apiCompany: CompanyApiResponse): import(
         location: apiCompany.location,
     };
 }
+
+
+export async function createCompany(companyData: any): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(companyData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to create company: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error creating company:", error);
+        throw error;
+    }
+}
