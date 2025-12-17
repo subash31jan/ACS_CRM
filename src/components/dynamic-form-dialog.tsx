@@ -30,6 +30,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useEffect } from "react";
 
 // Define form types
 type FormType = "company" | "contact" | "list";
@@ -65,6 +66,8 @@ interface DynamicFormDialogProps {
     onSubmit: (data: FormData) => void;
     companies?: { id: string; name: string }[]; // New prop for company dropdown
     onAddCompany?: () => void; // Callback to trigger company creation
+    defaultValues?: Partial<FormData>; // Optional default values for editing
+    isSubmitting?: boolean; // Loading state for submit button
 }
 
 export function DynamicFormDialog({
@@ -74,6 +77,8 @@ export function DynamicFormDialog({
     onSubmit,
     companies = [],
     onAddCompany,
+    defaultValues,
+    isSubmitting = false,
 }: DynamicFormDialogProps) {
     // Get schema based on form type
     const getSchema = () => {
@@ -126,8 +131,17 @@ export function DynamicFormDialog({
     // Initialize form with appropriate schema
     const form = useForm<any>({
         resolver: zodResolver(getSchema() as any),
-        defaultValues: getDefaultValues(),
+        defaultValues: defaultValues || getDefaultValues(),
     });
+
+    // Reset form when defaultValues change (for editing)
+    useEffect(() => {
+        if (defaultValues) {
+            form.reset(defaultValues);
+        } else {
+            form.reset(getDefaultValues());
+        }
+    }, [defaultValues, open]);
 
     const handleSubmit = (data: any) => {
         onSubmit(data);
@@ -310,10 +324,20 @@ export function DynamicFormDialog({
                                     form.reset();
                                     onOpenChange(false);
                                 }}
+                                disabled={isSubmitting}
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
+                                        Submitting...
+                                    </>
+                                ) : (
+                                    "Submit"
+                                )}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

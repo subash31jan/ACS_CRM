@@ -58,12 +58,15 @@ export function mapApiResponseToCompany(apiCompany: CompanyApiResponse): import(
 
 export async function createCompany(companyData: any): Promise<any> {
     try {
-        const response = await fetch("https://workflows.agilecyber.com/webhook/create-contact", {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-company", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(companyData),
+            body: JSON.stringify({
+                ...companyData,
+                cred: "create"
+            }),
         });
 
         if (!response.ok) {
@@ -74,6 +77,57 @@ export async function createCompany(companyData: any): Promise<any> {
         return data;
     } catch (error) {
         console.error("Error creating company:", error);
+        throw error;
+    }
+}
+
+export async function editCompany(companyId: string, companyData: any): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-company", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...companyData,
+                company_id: companyId,
+                cred: "edit"
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to edit company: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error editing company:", error);
+        throw error;
+    }
+}
+
+export async function deleteCompany(companyId: string): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-company", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                company_id: companyId,
+                cred: "delete"
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete company: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error deleting company:", error);
         throw error;
     }
 }
