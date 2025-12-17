@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { useContacts } from "./hooks/use-contacts";
 import { createContact } from "@/features/dashboard/pages/contacts/services/contact-api";
 import { useCompanies } from "@/features/dashboard/pages/companies/hooks/use-companies";
+import { createCompany } from "@/features/dashboard/pages/companies/services/company-api";
 import { ContactsTable } from "./components/contacts-table";
 import { ContactsFilters } from "./components/contacts-filters";
 import { Button } from "@/components/ui/button";
@@ -92,10 +93,25 @@ export function ContactsPage() {
     }
   };
 
-  const handleCompanyFormSubmit = (data: any) => {
-    console.log("Company form submitted:", data);
-    // TODO: Add logic to save the company (webhook, etc.)
-    // Ideally, after success, we refresh the companies list so it appears in the dropdown.
+  const handleCompanyFormSubmit = async (data: any) => {
+    try {
+      console.log("Company form submitted:", data);
+      await createCompany(data);
+
+      setFeedbackModal({
+        open: true,
+        title: "Success",
+        description: "Company created successfully. It will now be available in the dropdown.",
+        onOk: refreshContacts, // Reloading to refresh the companies list
+      });
+    } catch (error) {
+      console.error("Error creating company:", error);
+      setFeedbackModal({
+        open: true,
+        title: "Error",
+        description: "Failed to create company. Please try again.",
+      });
+    }
   };
 
   return (
