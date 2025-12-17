@@ -22,6 +22,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+
 // Define form types
 type FormType = "company" | "contact" | "list";
 
@@ -35,6 +44,8 @@ const contactSchema = z.object({
     email: z.string().email("Invalid email address"),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
+    companyId: z.string().max(200).optional(), // Assuming ID or just string for now.
+    subscription: z.boolean().default(false),
 });
 
 const listSchema = z.object({
@@ -52,6 +63,8 @@ interface DynamicFormDialogProps {
     onOpenChange: (open: boolean) => void;
     formType: FormType;
     onSubmit: (data: FormData) => void;
+    companies?: { id: string; name: string }[]; // New prop for company dropdown
+    onAddCompany?: () => void; // Callback to trigger company creation
 }
 
 export function DynamicFormDialog({
@@ -59,6 +72,8 @@ export function DynamicFormDialog({
     onOpenChange,
     formType,
     onSubmit,
+    companies = [],
+    onAddCompany,
 }: DynamicFormDialogProps) {
     // Get schema based on form type
     const getSchema = () => {
@@ -102,7 +117,7 @@ export function DynamicFormDialog({
             case "company":
                 return { companyName: "", location: "" };
             case "contact":
-                return { email: "", firstName: "", lastName: "" };
+                return { email: "", firstName: "", lastName: "", companyId: undefined, subscription: false };
             case "list":
                 return { listName: "" };
         }
@@ -165,6 +180,34 @@ export function DynamicFormDialog({
                         {/* Contact Form Fields */}
                         {formType === "contact" && (
                             <>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="firstName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>First Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="John" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="lastName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Last Name</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Doe" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                                 <FormField
                                     control={form.control}
                                     name="email"
@@ -174,7 +217,7 @@ export function DynamicFormDialog({
                                             <FormControl>
                                                 <Input
                                                     type="email"
-                                                    placeholder="Enter email"
+                                                    placeholder="john.doe@example.com"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -184,27 +227,58 @@ export function DynamicFormDialog({
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="firstName"
+                                    name="companyId"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>First Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="Enter first name" {...field} />
-                                            </FormControl>
+                                            <FormLabel>Company</FormLabel>
+                                            <div className="flex gap-2">
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="flex-1">
+                                                            <SelectValue placeholder="Select a company" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {companies?.map((company) => (
+                                                            <SelectItem key={company.id} value={company.id}>
+                                                                {company.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                {onAddCompany && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={onAddCompany}
+                                                        title="Add New Company"
+                                                    >
+                                                        <span className="sr-only">Add Company</span>
+                                                        +
+                                                    </Button>
+                                                )}
+                                            </div>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="lastName"
+                                    name="subscription"
                                     render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Last Name</FormLabel>
+                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                                            <div className="space-y-0.5">
+                                                <FormLabel>Subscription</FormLabel>
+                                                <DialogDescription>
+                                                    Is this contact subscribed?
+                                                </DialogDescription>
+                                            </div>
                                             <FormControl>
-                                                <Input placeholder="Enter last name" {...field} />
+                                                <Switch
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
                                             </FormControl>
-                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
