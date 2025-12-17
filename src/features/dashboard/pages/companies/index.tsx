@@ -19,6 +19,7 @@ import {
 
 export function CompaniesPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [feedbackModal, setFeedbackModal] = useState<{
         open: boolean;
         title: string;
@@ -47,60 +48,61 @@ export function CompaniesPage() {
     const isEmpty = allCompanies.length === 0;
 
     const handleFormSubmit = async (data: any) => {
+        setIsSubmitting(true);
         try {
             console.log("Company form submitted:", data);
 
-            // Send data to local API route (which will forward to webhook)
-            const response = await fetch("/api/webhook/create-contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
+            // Transform form data to match API expectations
+            const apiData = {
+                company_name: data.companyName,
+                location: data.location,
+            };
 
-            console.log("Response status:", response.status);
-            const responseData = await response.json();
+            // Import and use the createCompany function
+            const { createCompany } = await import("./services/company-api");
+            const responseData = await createCompany(apiData);
+
             console.log("Response data:", responseData);
 
-            if (!response.ok) {
-                // Check for "already exists" in 400 Bad Request
-                const responseString = JSON.stringify(responseData).toLowerCase();
-                if (response.status === 400 && responseString.includes("already exists")) {
-                    console.log("Duplicate company detected, showing modal");
-                    setFeedbackModal({
-                        open: true,
-                        title: "Duplicate Company",
-                        description: (
-                            <div className="flex flex-col gap-2">
-                                <p>This company already exists in the database.</p>
-                                <ul className="list-disc pl-4 space-y-1">
-                                    <li>You cannot create a new company with the same name.</li>
-                                    <li>Try editing the existing entry if you need to update it.</li>
-                                </ul>
-                            </div>
-                        ),
-                    });
-                    return;
-                }
-
-                throw new Error(responseData.message || `Webhook request failed: ${response.status}`);
-            }
-
-            console.log("Webhook triggered successfully");
+            console.log("Company created successfully");
             setFeedbackModal({
                 open: true,
                 title: "Company Created",
                 description: "The company has been successfully created.",
             });
-            // TODO: Refresh companies list
-        } catch (error) {
-            console.error("Error triggering webhook:", error);
+
+            // Refresh the page to show updated data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } catch (error: any) {
+            console.error("Error creating company:", error);
+
+            // Check for duplicate error
+            if (error.message?.toLowerCase().includes("already exists")) {
+                setFeedbackModal({
+                    open: true,
+                    title: "Duplicate Company",
+                    description: (
+                        <div className="flex flex-col gap-2">
+                            <p>This company already exists in the database.</p>
+                            <ul className="list-disc pl-4 space-y-1">
+                                <li>You cannot create a new company with the same name.</li>
+                                <li>Try editing the existing entry if you need to update it.</li>
+                            </ul>
+                        </div>
+                    ),
+                });
+                return;
+            }
+
             setFeedbackModal({
                 open: true,
                 title: "Error",
                 description: "Failed to create company. Please try again.",
             });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -169,6 +171,7 @@ export function CompaniesPage() {
                 onOpenChange={setIsFormOpen}
                 formType="company"
                 onSubmit={handleFormSubmit}
+                isSubmitting={isSubmitting}
             />
 
             <AlertDialog open={feedbackModal.open} onOpenChange={(open) => setFeedbackModal(prev => ({ ...prev, open }))}>
