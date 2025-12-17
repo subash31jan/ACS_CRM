@@ -3,13 +3,36 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useContacts } from "./hooks/use-contacts";
+import { createContact } from "@/features/dashboard/pages/contacts/services/contact-api";
+import { useCompanies } from "@/features/dashboard/pages/companies/hooks/use-companies";
 import { ContactsTable } from "./components/contacts-table";
 import { ContactsFilters } from "./components/contacts-filters";
 import { Button } from "@/components/ui/button";
 import { DynamicFormDialog } from "@/components/dynamic-form-dialog";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 export function ContactsPage() {
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false);
+  const [isCompanyFormOpen, setIsCompanyFormOpen] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    onOk?: () => void;
+  }>({
+    open: false,
+    title: "",
+    description: "",
+  });
 
   const {
     contacts,
@@ -24,11 +47,55 @@ export function ContactsPage() {
     handleClearFilters,
   } = useContacts();
 
+  // Fetch companies for the dropdown
+  const { allCompanies } = useCompanies();
+
+  // We need a way to refresh contacts. 
+  // Since useContacts fetches on mount, we might need to expose a refresh method or trigger re-fetch.
+  // For now, we will just log success or maybe we can create a way to force refresh.
+  // Actually, useContacts doesn't expose refresh. I should update useContacts to expose it or just reload page/state.
+  // I'll assume for this step I just implement the submit logic.
+
+  const refreshContacts = () => {
+    window.location.reload(); // Simple brute force refresh for now or I can update useContacts.
+    // Better: Update useContacts to return a refetch function.
+  };
+
   const isEmpty = allContacts.length === 0;
 
-  const handleFormSubmit = (data: any) => {
-    console.log("Contact form submitted:", data);
-    // TODO: Add logic to save the contact
+  const handleContactFormSubmit = async (data: any) => {
+    try {
+      console.log("Contact form submitted:", data);
+      await createContact(data);
+
+      setFeedbackModal({
+        open: true,
+        title: "Success",
+        description: "Contact created successfully.",
+        onOk: refreshContacts,
+      });
+    } catch (error) {
+      console.error("Error creating contact:", error);
+      if (error instanceof Error && error.message === "DUPLICATE_CONTACT") {
+        setFeedbackModal({
+          open: true,
+          title: "Contact Already Exists",
+          description: "The contact with the provided email already exists. You can edit the contact if needed.",
+        });
+      } else {
+        setFeedbackModal({
+          open: true,
+          title: "Error",
+          description: "Failed to create contact. Please try again.",
+        });
+      }
+    }
+  };
+
+  const handleCompanyFormSubmit = (data: any) => {
+    console.log("Company form submitted:", data);
+    // TODO: Add logic to save the company (webhook, etc.)
+    // Ideally, after success, we refresh the companies list so it appears in the dropdown.
   };
 
   return (
@@ -36,7 +103,7 @@ export function ContactsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
         <div className="flex items-center gap-4">
-          <Button onClick={() => setIsFormOpen(true)}>
+          <Button onClick={() => setIsContactFormOpen(true)}>
             <Plus className="size-4" />
             New Contact
           </Button>
@@ -76,11 +143,39 @@ export function ContactsPage() {
       )}
 
       <DynamicFormDialog
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
+        open={isContactFormOpen}
+        onOpenChange={setIsContactFormOpen}
         formType="contact"
-        onSubmit={handleFormSubmit}
+        onSubmit={handleContactFormSubmit}
+        companies={allCompanies.map(c => ({ id: c.id, name: c.companyName }))}
+        onAddCompany={() => setIsCompanyFormOpen(true)}
       />
+
+      <DynamicFormDialog
+        open={isCompanyFormOpen}
+        onOpenChange={setIsCompanyFormOpen}
+        formType="company"
+        onSubmit={handleCompanyFormSubmit}
+      />
+
+      <AlertDialog open={feedbackModal.open} onOpenChange={(open) => setFeedbackModal(prev => ({ ...prev, open }))}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{feedbackModal.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {feedbackModal.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => {
+              setFeedbackModal(prev => ({ ...prev, open: false }));
+              if (feedbackModal.onOk) feedbackModal.onOk();
+            }}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-} 
+}

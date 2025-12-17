@@ -25,65 +25,61 @@ export const useContactColumns = () => {
   return useMemo<ColumnDef<Contact>[]>(
     () => [
       {
-        accessorKey: "contactNumber",
+        accessorKey: "contact_id",
         header: "Contact ID",
         cell: ({ row }) => (
-          <div className="font-medium">{row.getValue("contactNumber")}</div>
-        ),
-      },
-      {
-        accessorKey: "fullName",
-        header: "Contact",
-        cell: ({ row }) => (
-          <div className="flex flex-col">
-            <span>{row.getValue("fullName")}</span>
-            <span className="text-sm text-muted-foreground">
-              {row.original.email}
-            </span>
+          <div className="font-medium text-xs truncate max-w-[80px]" title={row.getValue("contact_id")}>
+            {row.getValue("contact_id")}
           </div>
         ),
       },
       {
-        accessorKey: "company",
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => (
+          <div className="font-medium">{row.getValue("email")}</div>
+        ),
+      },
+      {
+        accessorKey: "first_name",
+        header: "First Name",
+        cell: ({ row }) => (
+          <div>{row.getValue("first_name")}</div>
+        ),
+      },
+      {
+        accessorKey: "last_name",
+        header: "Last Name",
+        cell: ({ row }) => (
+          <div>{row.getValue("last_name")}</div>
+        ),
+      },
+      {
+        accessorKey: "company_name", // Using the optional field for display
         header: "Company",
-        cell: ({ row }) => <div>{row.getValue("company")}</div>,
+        cell: ({ row }) => <div>{row.getValue("company_name") || "N/A"}</div>,
       },
       {
-        accessorKey: "dateJoined",
-        header: "Date Joined",
-        cell: ({ row }) => format(new Date(row.getValue("dateJoined")), "PP"),
-      },
-      {
-        accessorKey: "totalSpent",
-        header: "Total Spent",
-        cell: ({ row }) => formatCurrency(row.getValue("totalSpent")),
-      },
-      {
-        accessorKey: "lastPurchase",
-        header: "Last Purchase",
+        accessorKey: "subscription",
+        header: "Subscription",
         cell: ({ row }) => {
-          const lastPurchase = row.getValue("lastPurchase") as string;
-          return lastPurchase
-            ? format(new Date(lastPurchase), "PP")
-            : "No purchases yet";
-        },
-      },
-      {
-        accessorKey: "location",
-        header: "Location",
-        cell: ({ row }) => <div>{row.getValue("location")}</div>,
-      },
-      {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => {
-          const status = row.getValue("status") as ContactStatus;
+          const isSubscribed = row.getValue("subscription") as boolean;
           return (
-            <Badge className={statusColors[status]}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+            <Badge variant={isSubscribed ? "default" : "secondary"} className={isSubscribed ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}>
+              {isSubscribed ? "Subscribed" : "Not Subscribed"}
             </Badge>
           );
         },
+      },
+      {
+        accessorKey: "created_at",
+        header: "Created At",
+        cell: ({ row }) => format(new Date(row.getValue("created_at")), "PP"),
+      },
+      {
+        accessorKey: "updated_at",
+        header: "Updated At",
+        cell: ({ row }) => format(new Date(row.getValue("updated_at")), "PP"),
       },
       {
         id: "actions",
