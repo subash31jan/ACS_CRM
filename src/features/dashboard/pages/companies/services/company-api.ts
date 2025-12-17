@@ -13,6 +13,9 @@ export async function fetchCompanies(): Promise<CompanyApiResponse[]> {
             headers: {
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                from: "companies"
+            }),
         });
 
         if (!response.ok) {

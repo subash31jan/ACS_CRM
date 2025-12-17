@@ -15,11 +15,14 @@ export interface ContactApiResponse {
 
 export async function fetchContacts(): Promise<ContactApiResponse[]> {
     try {
-        const response = await fetch("https://workflows.agilecyber.com/webhook/fetch-contacts", {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/fetch", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+                from: "contacts"
+            }),
         });
 
         if (!response.ok) {
