@@ -46,6 +46,8 @@ export function ContactsPage() {
     handleSortingChange,
     handlePaginationChange,
     handleClearFilters,
+    isLoading,
+    error,
   } = useContacts();
 
   // Fetch companies for the dropdown
@@ -131,15 +133,31 @@ export function ContactsPage() {
           <ContactsFilters filters={filters} onFiltersChange={updateFilters} />
         </div>
         <div className="p-3">
-          <ContactsTable
-            contacts={contacts}
-            totalRows={allContacts.length}
-            sorting={sorting}
-            onSort={handleSortingChange}
-            pagination={pagination}
-            onPaginationChange={handlePaginationChange}
-            pageCount={pageCount}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                <p className="text-sm text-muted-foreground">Loading contacts...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="flex flex-col items-center gap-2 text-center">
+                <p className="text-sm font-medium text-destructive">Failed to load contacts</p>
+                <p className="text-xs text-muted-foreground">{error}</p>
+              </div>
+            </div>
+          ) : (
+            <ContactsTable
+              contacts={contacts}
+              totalRows={allContacts.length}
+              sorting={sorting}
+              onSort={handleSortingChange}
+              pagination={pagination}
+              onPaginationChange={handlePaginationChange}
+              pageCount={pageCount}
+            />
+          )}
         </div>
       </div>
 
