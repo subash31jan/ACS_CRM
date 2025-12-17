@@ -3,6 +3,7 @@ export type List = {
     listName: string;
     contactsCount: number;
     creationDate: string;
+    updatedAt?: string;
     description?: string;
     tags?: string[];
 };

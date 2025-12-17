@@ -12,21 +12,28 @@ export const useListColumns = () => {
             {
                 accessorKey: "listId",
                 header: "List ID",
-                cell: ({ row }) => (
-                    <div className="font-medium">{row.getValue("listId")}</div>
-                ),
+                cell: ({ row }) => {
+                    const id = row.getValue("listId") as string;
+                    return (
+                        <div className="font-medium" title={id}>
+                            {id ? `${id.substring(0, 8)}...` : ""}
+                        </div>
+                    );
+                },
             },
             {
                 accessorKey: "listName",
                 header: "List Name",
                 cell: ({ row }) => (
-                    <div className="flex flex-col">
-                        <span>{row.getValue("listName")}</span>
-                        {row.original.description && (
-                            <span className="text-sm text-muted-foreground">
-                                {row.original.description}
-                            </span>
-                        )}
+                    <div className="font-medium">{row.getValue("listName")}</div>
+                ),
+            },
+            {
+                accessorKey: "description",
+                header: "Description",
+                cell: ({ row }) => (
+                    <div className="text-muted-foreground truncate max-w-[300px]" title={row.getValue("description")}>
+                        {row.getValue("description") || "-"}
                     </div>
                 ),
             },
@@ -42,7 +49,24 @@ export const useListColumns = () => {
             {
                 accessorKey: "creationDate",
                 header: "Creation Date",
-                cell: ({ row }) => format(new Date(row.getValue("creationDate")), "PP"),
+                cell: ({ row }) => {
+                    const dateValue = row.getValue("creationDate");
+                    if (!dateValue) return "-";
+                    const date = new Date(dateValue as string | number | Date);
+                    if (isNaN(date.getTime())) return "-";
+                    return format(date, "PP");
+                },
+            },
+            {
+                accessorKey: "updatedAt",
+                header: "Updated At",
+                cell: ({ row }) => {
+                    const dateValue = row.getValue("updatedAt");
+                    if (!dateValue) return "-";
+                    const date = new Date(dateValue as string | number | Date);
+                    if (isNaN(date.getTime())) return "-";
+                    return format(date, "PP");
+                },
             },
             {
                 id: "actions",

@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
+import { Textarea } from "@/components/ui/textarea";
+
 // Define form types
 type FormType = "company" | "contact" | "list";
 
@@ -50,6 +52,7 @@ const contactSchema = z.object({
 
 const listSchema = z.object({
     listName: z.string().min(1, "List name is required"),
+    description: z.string().optional(),
 });
 
 // Type for form data based on schema
@@ -107,7 +110,7 @@ export function DynamicFormDialog({
             case "contact":
                 return "Add a new contact to your CRM.";
             case "list":
-                return "Create a new list.";
+                return "Create a new list for your contacts.";
         }
     };
 
@@ -119,7 +122,7 @@ export function DynamicFormDialog({
             case "contact":
                 return { email: "", firstName: "", lastName: "", companyId: undefined, subscription: false };
             case "list":
-                return { listName: "" };
+                return { listName: "", description: "" };
         }
     };
 
@@ -287,19 +290,38 @@ export function DynamicFormDialog({
 
                         {/* List Form Fields */}
                         {formType === "list" && (
-                            <FormField
-                                control={form.control}
-                                name="listName"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>List Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Enter list name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            <>
+                                <FormField
+                                    control={form.control}
+                                    name="listName"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>List Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter list name" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Description (Optional)</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Enter list description"
+                                                    className="resize-none"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
                         )}
 
                         <DialogFooter>
