@@ -77,3 +77,33 @@ export async function createList(listData: any): Promise<any> {
         throw error;
     }
 }
+
+export async function addContactsToList(listId: string, contactIds: string[]): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/add-contacts-to-list", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                list_id: listId,
+                contact_ids: contactIds,
+            }),
+        });
+
+        if (response.status === 200) {
+            try {
+                return await response.json();
+            } catch {
+                return { success: true };
+            }
+        } else if (response.status === 400) {
+            throw new Error("ALREADY_EXISTS");
+        } else {
+            throw new Error("GENERIC_ERROR");
+        }
+    } catch (error) {
+        // console.error("Error adding contacts to list:", error); // Let the component handle logging or ignoring specific errors if needed
+        throw error;
+    }
+}
