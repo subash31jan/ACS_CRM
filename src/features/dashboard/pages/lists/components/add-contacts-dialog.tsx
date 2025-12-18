@@ -39,12 +39,14 @@ interface AddContactsDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onComplete?: (result: { success: boolean; message?: string; type?: 'success' | 'error' | 'warning' }) => void;
+    preSelectedListId?: string;
 }
 
 export function AddContactsDialog({
     open,
     onOpenChange,
     onComplete,
+    preSelectedListId,
 }: AddContactsDialogProps) {
     const [lists, setLists] = useState<List[]>([]);
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -57,8 +59,13 @@ export function AddContactsDialog({
     useEffect(() => {
         if (open) {
             loadData();
+            if (preSelectedListId) {
+                setSelectedListId(preSelectedListId);
+            } else {
+                setSelectedListId("");
+            }
         }
-    }, [open]);
+    }, [open, preSelectedListId]);
 
     const loadData = async () => {
         try {
@@ -147,7 +154,11 @@ export function AddContactsDialog({
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                 Target List
                             </label>
-                            <Select value={selectedListId} onValueChange={setSelectedListId}>
+                            <Select
+                                value={selectedListId}
+                                onValueChange={setSelectedListId}
+                                disabled={!!preSelectedListId}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a list" />
                                 </SelectTrigger>

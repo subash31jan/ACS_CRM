@@ -107,3 +107,40 @@ export async function addContactsToList(listId: string, contactIds: string[]): P
         throw error;
     }
 }
+
+export async function getContactsByListId(listId: string): Promise<any[]> {
+    try {
+        const response = await fetch(`https://workflows.agilecyber.com/webhook/get-contacts-by-id?list_id=${listId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            return [];
+        }
+
+        // The user mentioned "for now there will be no response"
+        // So let's gracefully handle potentially empty or non-JSON responses
+        const text = await response.text();
+        if (!text) return [];
+
+        const data = JSON.parse(text);
+        if (Array.isArray(data)) {
+            return data;
+        } else if (data && typeof data === 'object') {
+            // Check for common wrapper properties
+            if (Array.isArray((data as any).data)) return (data as any).data;
+            if (Array.isArray((data as any).items)) return (data as any).items;
+            if (Array.isArray((data as any).contacts)) return (data as any).contacts;
+
+            return [data];
+        }
+        return [];
+
+    } catch (error) {
+        console.error("Error fetching contacts by list id:", error);
+        return [];
+    }
+}

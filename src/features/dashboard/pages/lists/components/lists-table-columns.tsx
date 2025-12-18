@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo } from "react";
 import { List } from "@/features/dashboard/pages/lists/types/list";
 import { format } from "date-fns";
@@ -25,7 +27,11 @@ export const useListColumns = () => {
                 accessorKey: "listName",
                 header: "List Name",
                 cell: ({ row }) => (
-                    <div className="font-medium">{row.getValue("listName")}</div>
+                    <div className="font-medium">
+                        <Link href={`/dashboard/lists/${row.original.listId}`} className="hover:underline text-primary">
+                            {row.getValue("listName")}
+                        </Link>
+                    </div>
                 ),
             },
             {
