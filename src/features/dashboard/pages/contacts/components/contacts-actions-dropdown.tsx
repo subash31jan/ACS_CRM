@@ -24,17 +24,22 @@ import { Button } from "@/components/ui/button";
 
 interface ContactActionsProps {
   contact: Contact;
+  onEdit?: (contact: Contact) => void;
+  onDelete?: (contact: Contact) => void;
 }
 
-export function ContactActionsDropdown({ contact }: ContactActionsProps) {
+export function ContactActionsDropdown({ contact, onEdit, onDelete }: ContactActionsProps) {
   const handleViewDetails = () => {
     // Implement view details functionality
     console.log("View contact details", contact.contact_id);
   };
 
   const handleEditContact = () => {
-    // Implement edit contact functionality
-    console.log("Edit contact", contact.contact_id);
+    if (onEdit) {
+      onEdit(contact);
+    } else {
+      console.log("Edit contact", contact.contact_id);
+    }
   };
 
   const handleViewPurchases = () => {
@@ -68,8 +73,11 @@ export function ContactActionsDropdown({ contact }: ContactActionsProps) {
   };
 
   const handleDeleteContact = () => {
-    // Implement delete functionality
-    console.log("Delete contact", contact.contact_id);
+    if (onDelete) {
+      onDelete(contact);
+    } else {
+      console.log("Delete contact", contact.contact_id);
+    }
   };
 
   return (
