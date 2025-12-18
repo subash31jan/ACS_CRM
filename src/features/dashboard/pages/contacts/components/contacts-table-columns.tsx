@@ -21,7 +21,10 @@ export const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
-export const useContactColumns = () => {
+export const useContactColumns = (
+  onEdit?: (contact: Contact) => void,
+  onDelete?: (contact: Contact) => void
+) => {
   return useMemo<ColumnDef<Contact>[]>(
     () => [
       {
@@ -84,9 +87,9 @@ export const useContactColumns = () => {
       {
         id: "actions",
         header: "",
-        cell: ({ row }) => <ContactActionsDropdown contact={row.original} />,
+        cell: ({ row }) => <ContactActionsDropdown contact={row.original} onEdit={onEdit} onDelete={onDelete} />,
       },
     ],
-    []
+    [onEdit, onDelete]
   );
 }; 

@@ -30,6 +30,8 @@ interface ContactsTableProps {
   pagination: PaginationState;
   onPaginationChange: OnChangeFn<PaginationState>;
   pageCount: number;
+  onEdit?: (contact: Contact) => void;
+  onDelete?: (contact: Contact) => void;
 }
 
 export function ContactsTable({
@@ -40,8 +42,10 @@ export function ContactsTable({
   pagination,
   onPaginationChange,
   pageCount,
+  onEdit,
+  onDelete,
 }: ContactsTableProps) {
-  const columns = useContactColumns();
+  const columns = useContactColumns(onEdit, onDelete);
 
   const table = useReactTable({
     data: contacts,

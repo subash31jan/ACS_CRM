@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { useContacts } from "./hooks/use-contacts";
-import { createContact } from "@/features/dashboard/pages/contacts/services/contact-api";
+import { createContact, editContact, deleteContact } from "@/features/dashboard/pages/contacts/services/contact-api";
 import { useCompanies } from "@/features/dashboard/pages/companies/hooks/use-companies";
 import { createCompany } from "@/features/dashboard/pages/companies/services/company-api";
+import { Contact } from "./types/contact";
 import { ContactsTable } from "./components/contacts-table";
 import { ContactsFilters } from "./components/contacts-filters";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,9 @@ import {
 export function ContactsPage() {
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
   const [isCompanyFormOpen, setIsCompanyFormOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [deletingContact, setDeletingContact] = useState<Contact | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
     open: boolean;
     title: string;
@@ -116,6 +120,68 @@ export function ContactsPage() {
     }
   };
 
+  const handleEditContact = (contact: Contact) => {
+    setEditingContact(contact);
+  };
+
+  const handleEditFormSubmit = async (data: any) => {
+    if (!editingContact) return;
+
+    setIsSubmitting(true);
+    try {
+      console.log("Edit contact form submitted:", data);
+      await editContact(editingContact.contact_id, data);
+
+      setFeedbackModal({
+        open: true,
+        title: "Success",
+        description: "Contact updated successfully.",
+        onOk: refreshContacts,
+      });
+      setEditingContact(null);
+    } catch (error) {
+      console.error("Error editing contact:", error);
+      setFeedbackModal({
+        open: true,
+        title: "Error",
+        description: "Failed to update contact. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteContact = (contact: Contact) => {
+    setDeletingContact(contact);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingContact) return;
+
+    setIsSubmitting(true);
+    try {
+      console.log("Deleting contact:", deletingContact.contact_id);
+      await deleteContact(deletingContact.contact_id);
+
+      setFeedbackModal({
+        open: true,
+        title: "Success",
+        description: "Contact deleted successfully.",
+        onOk: refreshContacts,
+      });
+      setDeletingContact(null);
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      setFeedbackModal({
+        open: true,
+        title: "Error",
+        description: "Failed to delete contact. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -156,6 +222,8 @@ export function ContactsPage() {
               pagination={pagination}
               onPaginationChange={handlePaginationChange}
               pageCount={pageCount}
+              onEdit={handleEditContact}
+              onDelete={handleDeleteContact}
             />
           )}
         </div>
@@ -191,6 +259,57 @@ export function ContactsPage() {
         formType="company"
         onSubmit={handleCompanyFormSubmit}
       />
+
+      <DynamicFormDialog
+        open={!!editingContact}
+        onOpenChange={(open) => !open && setEditingContact(null)}
+        formType="contact"
+        onSubmit={handleEditFormSubmit}
+        companies={allCompanies.map(c => ({ id: c.id, name: c.companyName }))}
+        onAddCompany={() => setIsCompanyFormOpen(true)}
+        defaultValues={editingContact ? {
+          email: editingContact.email,
+          firstName: editingContact.first_name || "",
+          lastName: editingContact.last_name || "",
+          companyId: editingContact.company_id || undefined,
+          subscription: editingContact.subscription,
+        } : undefined}
+        isSubmitting={isSubmitting}
+      />
+
+      <AlertDialog open={!!deletingContact} onOpenChange={(open) => !open && setDeletingContact(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {deletingContact?.first_name} {deletingContact?.last_name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeletingContact(null)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={feedbackModal.open} onOpenChange={(open) => setFeedbackModal(prev => ({ ...prev, open }))}>
         <AlertDialogContent>

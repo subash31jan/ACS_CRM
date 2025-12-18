@@ -66,7 +66,10 @@ export async function createContact(contactData: any): Promise<any> {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(contactData),
+            body: JSON.stringify({
+                ...contactData,
+                cred: "create"
+            }),
         });
 
         if (!response.ok) {
@@ -101,6 +104,95 @@ export async function createContact(contactData: any): Promise<any> {
         return data;
     } catch (error) {
         console.error("Error creating contact:", error);
+        throw error;
+    }
+}
+
+export async function editContact(contactId: string, contactData: any): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-a-contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...contactData,
+                contact_id: contactId,
+                cred: "edit"
+            }),
+        });
+
+        if (!response.ok) {
+            let errorMessage = `Failed to edit contact: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (typeof errorData === 'string') {
+                    errorMessage = errorData;
+                } else if (errorData?.message) {
+                    errorMessage = errorData.message;
+                } else {
+                    errorMessage = JSON.stringify(errorData);
+                }
+            } catch (e) {
+                try {
+                    const textError = await response.text();
+                    if (textError) errorMessage = textError;
+                } catch (textErr) {
+                    // ignore
+                }
+            }
+
+            throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error editing contact:", error);
+        throw error;
+    }
+}
+
+export async function deleteContact(contactId: string): Promise<any> {
+    try {
+        const response = await fetch("https://workflows.agilecyber.com/webhook/create-a-contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                contact_id: contactId,
+                cred: "delete"
+            }),
+        });
+
+        if (!response.ok) {
+            let errorMessage = `Failed to delete contact: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (typeof errorData === 'string') {
+                    errorMessage = errorData;
+                } else if (errorData?.message) {
+                    errorMessage = errorData.message;
+                } else {
+                    errorMessage = JSON.stringify(errorData);
+                }
+            } catch (e) {
+                try {
+                    const textError = await response.text();
+                    if (textError) errorMessage = textError;
+                } catch (textErr) {
+                    // ignore
+                }
+            }
+
+            throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error deleting contact:", error);
         throw error;
     }
 }
