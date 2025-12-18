@@ -29,17 +29,17 @@ interface ContactActionsProps {
 export function ContactActionsDropdown({ contact }: ContactActionsProps) {
   const handleViewDetails = () => {
     // Implement view details functionality
-    console.log("View contact details", contact.contactNumber);
+    console.log("View contact details", contact.contact_id);
   };
 
   const handleEditContact = () => {
     // Implement edit contact functionality
-    console.log("Edit contact", contact.contactNumber);
+    console.log("Edit contact", contact.contact_id);
   };
 
   const handleViewPurchases = () => {
     // Implement view purchases functionality
-    console.log("View purchases for", contact.contactNumber);
+    console.log("View purchases for", contact.contact_id);
   };
 
   const handleSendEmail = () => {
@@ -49,27 +49,27 @@ export function ContactActionsDropdown({ contact }: ContactActionsProps) {
 
   const handleCreateOrder = () => {
     // Implement new order functionality
-    console.log("Create order for", contact.contactNumber);
+    console.log("Create order for", contact.contact_id);
   };
 
   const handleViewInvoices = () => {
     // Implement view invoices functionality
-    console.log("View invoices for", contact.contactNumber);
+    console.log("View invoices for", contact.contact_id);
   };
 
   const handleActivateContact = () => {
     // Implement activation functionality
-    console.log("Activate contact", contact.contactNumber);
+    console.log("Activate contact", contact.contact_id);
   };
 
   const handleBlockContact = () => {
     // Implement block functionality
-    console.log("Block contact", contact.contactNumber);
+    console.log("Block contact", contact.contact_id);
   };
 
   const handleDeleteContact = () => {
     // Implement delete functionality
-    console.log("Delete contact", contact.contactNumber);
+    console.log("Delete contact", contact.contact_id);
   };
 
   return (
@@ -109,18 +109,18 @@ export function ContactActionsDropdown({ contact }: ContactActionsProps) {
             <span>Send Email</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {(contact.status === "inactive" || contact.status === "blocked") && (
+          {/* {(contact.status === "inactive" || contact.status === "blocked") && (
             <DropdownMenuItem onClick={handleActivateContact}>
               <UserCheck className="mr-2 h-4 w-4" />
               <span>Activate Contact</span>
             </DropdownMenuItem>
-          )}
-          {contact.status !== "blocked" && (
+          )} */}
+          {/* {contact.status !== "blocked" && (
             <DropdownMenuItem onClick={handleBlockContact} className="text-amber-600">
               <Ban className="mr-2 h-4 w-4" />
               <span>Block Contact</span>
             </DropdownMenuItem>
-          )}
+          )} */}
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleDeleteContact}

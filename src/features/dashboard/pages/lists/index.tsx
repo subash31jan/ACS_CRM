@@ -24,9 +24,8 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus } from "lucide-react";
 import { DynamicFormDialog } from "@/components/dynamic-form-dialog";
-
 import { createList, fetchLists } from "./services/list-api";
 import {
     AlertDialog,
@@ -37,11 +36,13 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { AddContactsDialog } from "./components/add-contacts-dialog";
 
 export default function ListsPage() {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isAddContactsOpen, setIsAddContactsOpen] = useState(false);
     const [lists, setLists] = useState<List[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -118,6 +119,15 @@ export default function ListsPage() {
         }
     };
 
+    const handleAddContactsComplete = (result: { success: boolean; message?: string; type?: 'success' | 'error' | 'warning' }) => {
+        setFeedbackModal({
+            open: true,
+            title: result.type === 'error' ? 'Error' : (result.type === 'warning' ? 'Warning' : 'Success'),
+            description: result.message || (result.success ? "Contacts added to list successfully." : "Operation completed."),
+            onOk: result.success ? refreshLists : undefined,
+        });
+    };
+
     return (
         <div className="flex flex-col gap-4 p-8">
             <div className="flex items-center justify-between">
@@ -127,10 +137,16 @@ export default function ListsPage() {
                         Manage your contact lists and segments
                     </p>
                 </div>
-                <Button onClick={() => setIsFormOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New List
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => setIsAddContactsOpen(true)}>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Add Contacts to List
+                    </Button>
+                    <Button onClick={() => setIsFormOpen(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create New List
+                    </Button>
+                </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -216,6 +232,12 @@ export default function ListsPage() {
                 onOpenChange={setIsFormOpen}
                 formType="list"
                 onSubmit={handleFormSubmit}
+            />
+
+            <AddContactsDialog
+                open={isAddContactsOpen}
+                onOpenChange={setIsAddContactsOpen}
+                onComplete={handleAddContactsComplete}
             />
 
             <AlertDialog open={feedbackModal.open} onOpenChange={(open) => setFeedbackModal(prev => ({ ...prev, open }))}>
