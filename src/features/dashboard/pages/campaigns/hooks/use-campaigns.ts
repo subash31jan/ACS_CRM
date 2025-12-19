@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Campaign, CampaignFilters } from "../types/campaign";
-import { mockCampaigns } from "../data/mock-campaigns";
 import { SortingState, PaginationState } from "@tanstack/react-table";
 
 export function useCampaigns() {
+    const [campaignsData, setCampaignsData] = useState<Campaign[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [filters, setFilters] = useState<CampaignFilters>({
         status: "all",
         search: "",
@@ -21,9 +24,40 @@ export function useCampaigns() {
         pageSize: 10,
     });
 
+    // Fetch campaigns on mount
+    useEffect(() => {
+        const fetchCampaigns = async () => {
+            try {
+                setIsLoading(true);
+                const response = await fetch("https://workflows.agilecyber.com/webhook/fetch-campaigns");
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch campaigns: ${response.status}`);
+                }
+
+                const data = await response.json();
+                // Ensure data is an array
+                if (Array.isArray(data)) {
+                    setCampaignsData(data);
+                } else {
+                    console.error("Fetched data is not an array:", data);
+                    setCampaignsData([]);
+                    // Optional: setError("Invalid data format received");
+                }
+            } catch (err) {
+                console.error("Error fetching campaigns:", err);
+                setError(err instanceof Error ? err.message : "Failed to fetch campaigns");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCampaigns();
+    }, []);
+
     // Filter campaigns based on current filters
     const allCampaigns = useMemo(() => {
-        let filtered = [...mockCampaigns];
+        let filtered = [...campaignsData];
 
         // Filter by status
         if (filters.status !== "all") {
@@ -51,7 +85,7 @@ export function useCampaigns() {
         }
 
         return filtered;
-    }, [filters]);
+    }, [filters, campaignsData]);
 
     // Sort campaigns
     const sortedCampaigns = useMemo(() => {
@@ -119,7 +153,7 @@ export function useCampaigns() {
         handleSortingChange,
         handlePaginationChange,
         handleClearFilters,
-        isLoading: false,
-        error: null,
+        isLoading,
+        error,
     };
 }
