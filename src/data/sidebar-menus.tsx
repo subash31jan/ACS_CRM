@@ -4,8 +4,8 @@ import {
   FileText,
   BarChart,
   Settings2,
-  LifeBuoy,
   Send,
+  LifeBuoy,
   Frame,
   PieChart,
   Map,
@@ -80,6 +80,21 @@ export const sidebarMenus = {
         {
           title: "Import/Export",
           url: "/dashboard/lists/import-export",
+        },
+      ],
+    },
+    {
+      title: "Campaigns",
+      url: "/dashboard/campaigns",
+      icon: Send,
+      items: [
+        {
+          title: "All Campaigns",
+          url: "/dashboard/campaigns",
+        },
+        {
+          title: "Import/Export",
+          url: "/dashboard/campaigns/import-export",
         },
       ],
     },
