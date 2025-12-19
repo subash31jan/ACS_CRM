@@ -40,9 +40,12 @@ export const useCampaignColumns = (
                 accessorKey: "status",
                 header: "Status",
                 cell: ({ row }) => {
-                    const status = row.getValue("status") as CampaignStatus;
+                    const status = row.getValue("status") as CampaignStatus | undefined | null;
+                    if (!status) {
+                        return <Badge variant="secondary">Unknown</Badge>;
+                    }
                     return (
-                        <Badge variant="secondary" className={statusColors[status]}>
+                        <Badge variant="secondary" className={statusColors[status] || "bg-gray-100 text-gray-800"}>
                             {status.charAt(0).toUpperCase() + status.slice(1)}
                         </Badge>
                     );

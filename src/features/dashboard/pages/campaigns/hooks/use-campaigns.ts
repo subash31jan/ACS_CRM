@@ -31,13 +31,35 @@ export function useCampaigns() {
                 setIsLoading(true);
                 const response = await fetch("https://workflows.agilecyber.com/webhook/fetch-campaigns");
 
+                if (response.status === 201) {
+                    setCampaignsData([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                if (response.status === 500) {
+                    const text = await response.text();
+                    // Check for empty string or empty JSON object/array
+                    if (!text || text.trim() === "" || text.trim() === "{}" || text.trim() === "[]") {
+                        setCampaignsData([]);
+                        setIsLoading(false);
+                        return;
+                    }
+                    throw new Error(`Failed to fetch campaigns: ${response.status}`);
+                }
+
                 if (!response.ok) {
                     throw new Error(`Failed to fetch campaigns: ${response.status}`);
                 }
 
                 const data = await response.json();
+
+                // Check for [{}] response which indicates empty data
+                if (Array.isArray(data) && data.length === 1 && Object.keys(data[0]).length === 0) {
+                    setCampaignsData([]);
+                }
                 // Ensure data is an array
-                if (Array.isArray(data)) {
+                else if (Array.isArray(data)) {
                     setCampaignsData(data);
                 } else {
                     console.error("Fetched data is not an array:", data);
