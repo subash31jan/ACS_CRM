@@ -5,7 +5,10 @@ export interface Campaign {
     name: string;
     status: CampaignStatus;
     scheduled_at: string | null;
+    sending_started_at: string | null;
+    sent_at: string | null;
     created_at: string;
+    updated_at: string;
 }
 
 export interface CampaignFilters {

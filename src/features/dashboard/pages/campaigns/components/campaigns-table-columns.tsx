@@ -57,9 +57,30 @@ export const useCampaignColumns = (
                 },
             },
             {
+                accessorKey: "sending_started_at",
+                header: "Sending Started",
+                cell: ({ row }) => {
+                    const date = row.getValue("sending_started_at") as string | null;
+                    return <div>{date ? format(new Date(date), "PPp") : "N/A"}</div>;
+                },
+            },
+            {
+                accessorKey: "sent_at",
+                header: "Sent",
+                cell: ({ row }) => {
+                    const date = row.getValue("sent_at") as string | null;
+                    return <div>{date ? format(new Date(date), "PPp") : "N/A"}</div>;
+                },
+            },
+            {
                 accessorKey: "created_at",
                 header: "Created At",
                 cell: ({ row }) => format(new Date(row.getValue("created_at")), "PP"),
+            },
+            {
+                accessorKey: "updated_at",
+                header: "Updated At",
+                cell: ({ row }) => format(new Date(row.getValue("updated_at")), "PP"),
             },
             {
                 id: "actions",

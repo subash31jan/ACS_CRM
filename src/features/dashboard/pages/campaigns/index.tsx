@@ -51,8 +51,10 @@ export function CampaignsPage() {
 
     const [formData, setFormData] = useState({
         name: "",
+        from_name: "",
+        from_email: "",
+        reply_to_email: "",
         status: "draft" as const,
-        scheduled_at: "",
     });
 
     const {
@@ -74,18 +76,48 @@ export function CampaignsPage() {
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
-        // Empty function for now as requested - just log the data
-        console.log("Campaign form submitted:", formData);
+        try {
+            const response = await fetch("https://workflows.agilecyber.com/webhook/create-a-campaign", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
 
-        setFeedbackModal({
-            open: true,
-            title: "Info",
-            description: "Campaign creation is not implemented yet. Form data logged to console.",
-        });
+            if (!response.ok) {
+                throw new Error(`Webhook failed with status: ${response.status}`);
+            }
 
-        setIsFormOpen(false);
-        setFormData({ name: "", status: "draft", scheduled_at: "" });
+            // We ignore the response body for now as requested
+            console.log("Campaign form submitted to webhook:", formData);
+
+            setFeedbackModal({
+                open: true,
+                title: "Success",
+                description: "Campaign created successfully!",
+            });
+
+            setIsFormOpen(false);
+            setFormData({
+                name: "",
+                from_name: "",
+                from_email: "",
+                reply_to_email: "",
+                status: "draft",
+            });
+        } catch (error) {
+            console.error("Error submitting campaign:", error);
+            setFeedbackModal({
+                open: true,
+                title: "Error",
+                description: "Failed to create campaign. Please try again.",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleEditCampaign = (campaign: Campaign) => {
@@ -172,7 +204,7 @@ export function CampaignsPage() {
                     <form onSubmit={handleFormSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Campaign Name</Label>
+                                <Label htmlFor="name">Campaign Name <span className="text-destructive">*</span></Label>
                                 <Input
                                     id="name"
                                     value={formData.name}
@@ -182,29 +214,34 @@ export function CampaignsPage() {
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="status">Status</Label>
-                                <Select
-                                    value={formData.status}
-                                    onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="draft">Draft</SelectItem>
-                                        <SelectItem value="scheduled">Scheduled</SelectItem>
-                                        <SelectItem value="sending">Sending</SelectItem>
-                                        <SelectItem value="sent">Sent</SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                <Label htmlFor="from_name">From Name <span className="text-destructive">*</span></Label>
+                                <Input
+                                    id="from_name"
+                                    value={formData.from_name}
+                                    onChange={(e) => setFormData({ ...formData, from_name: e.target.value })}
+                                    placeholder="e.g. John Doe"
+                                    required
+                                />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="scheduled_at">Scheduled At (Optional)</Label>
+                                <Label htmlFor="from_email">From Email <span className="text-destructive">*</span></Label>
                                 <Input
-                                    id="scheduled_at"
-                                    type="datetime-local"
-                                    value={formData.scheduled_at}
-                                    onChange={(e) => setFormData({ ...formData, scheduled_at: e.target.value })}
+                                    id="from_email"
+                                    type="email"
+                                    value={formData.from_email}
+                                    onChange={(e) => setFormData({ ...formData, from_email: e.target.value })}
+                                    placeholder="e.g. john@example.com"
+                                    required
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="reply_to_email">Reply-to Email (Optional)</Label>
+                                <Input
+                                    id="reply_to_email"
+                                    type="email"
+                                    value={formData.reply_to_email}
+                                    onChange={(e) => setFormData({ ...formData, reply_to_email: e.target.value })}
+                                    placeholder="e.g. support@example.com"
                                 />
                             </div>
                         </div>
