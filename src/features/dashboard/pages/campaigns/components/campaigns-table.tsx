@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Campaign } from "@/features/dashboard/pages/campaigns/types/campaign";
 import {
     Table,
@@ -45,6 +46,7 @@ export function CampaignsTable({
     onEdit,
     onDelete,
 }: CampaignsTableProps) {
+    const router = useRouter();
     const columns = useCampaignColumns(onEdit, onDelete);
 
     const table = useReactTable({
@@ -81,6 +83,8 @@ export function CampaignsTable({
                             <TableRow
                                 key={row.id}
                                 data-state={row.getIsSelected() && "selected"}
+                                className="cursor-pointer hover:bg-muted/50"
+                                onClick={() => router.push(`/dashboard/marketing/email-campaigns/${row.original.id}`)}
                             >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>
