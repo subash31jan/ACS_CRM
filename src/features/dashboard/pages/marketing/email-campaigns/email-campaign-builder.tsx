@@ -9,9 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -27,6 +30,10 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
     const [selectedListIds, setSelectedListIds] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Setup step fields
+    const [subject, setSubject] = useState("");
+    const [preheader, setPreheader] = useState("");
 
     useEffect(() => {
         const loadLists = async () => {
@@ -69,6 +76,55 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
                 console.error("Error adding lists to campaign:", err);
                 // toast.error("Failed to add lists. Please try again.");
                 setError("Failed to update campaign. Please try again.");
+            } finally {
+                setIsSubmitting(false);
+            }
+        } else if (currentStep === 2) {
+            // Setup step - send webhook with subject, preheader, and campaign_id
+            try {
+                setIsSubmitting(true);
+                setError(null); // Clear any previous errors
+
+                const payload = {
+                    campaign_id: campaignId,
+                    subject: subject,
+                    ...(preheader && { preheader: preheader }) // Only include preheader if it's not empty
+                };
+
+                const response = await fetch('https://workflows.agilecyber.com/webhook/Campaign-Builder-setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    // Try to get error message from response
+                    let errorMessage = 'Failed to save setup';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.message || errorData.error || errorMessage;
+                    } catch {
+                        // If response is not JSON, use status text
+                        errorMessage = response.statusText || errorMessage;
+                    }
+
+                    console.error(`Setup failed with status ${response.status}:`, errorMessage);
+                    toast.error(errorMessage);
+                    setError(errorMessage);
+                    return; // Don't proceed to next step
+                }
+
+                console.log('Setup data sent successfully:', payload);
+                toast.success("Setup completed successfully");
+
+                setCurrentStep(prev => prev + 1);
+            } catch (err) {
+                console.error("Error sending setup data:", err);
+                const errorMessage = err instanceof Error ? err.message : "Failed to save setup. Please try again.";
+                toast.error(errorMessage);
+                setError(errorMessage);
             } finally {
                 setIsSubmitting(false);
             }
@@ -185,10 +241,68 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
                     </Card>
                 )}
 
-                {currentStep > 1 && (
+                {currentStep === 2 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Campaign Setup</CardTitle>
+                            <CardDescription>
+                                Configure your email campaign subject and preheader.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="subject">
+                                    Subject <span className="text-destructive">*</span>
+                                </Label>
+                                <Input
+                                    id="subject"
+                                    placeholder="Enter email subject"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                    required
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    This will be the subject line of your email campaign.
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="preheader">Preheader (Optional)</Label>
+                                <Textarea
+                                    id="preheader"
+                                    placeholder="Enter preheader text"
+                                    value={preheader}
+                                    onChange={(e) => setPreheader(e.target.value)}
+                                    rows={3}
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Preheader text appears next to the subject line in email clients.
+                                </p>
+                            </div>
+
+                            {error && currentStep === 2 && (
+                                <Alert variant="destructive">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            )}
+                        </CardContent>
+                        <CardFooter className="flex justify-between border-t p-6">
+                            <Button variant="outline" onClick={() => setCurrentStep(1)} disabled={isSubmitting}>
+                                Back
+                            </Button>
+                            <Button onClick={handleNext} disabled={!subject.trim() || isSubmitting}>
+                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                )}
+
+                {currentStep > 2 && (
                     <div className="flex flex-col items-center justify-center py-12 border rounded-lg border-dashed">
                         <p className="text-muted-foreground">Next steps coming soon...</p>
-                        <Button variant="outline" className="mt-4" onClick={() => setCurrentStep(1)}>Back to Audience</Button>
+                        <Button variant="outline" className="mt-4" onClick={() => setCurrentStep(2)}>Back to Setup</Button>
                     </div>
                 )}
             </div>
