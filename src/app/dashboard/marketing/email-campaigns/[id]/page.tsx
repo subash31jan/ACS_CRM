@@ -1,11 +1,12 @@
 import { EmailCampaignBuilder } from "@/features/dashboard/pages/marketing/email-campaigns/email-campaign-builder";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
-export default function Page({ params }: PageProps) {
-    return <EmailCampaignBuilder campaignId={params.id} />;
+export default async function Page({ params }: PageProps) {
+    const { id } = await params;
+    return <EmailCampaignBuilder campaignId={id} />;
 }
