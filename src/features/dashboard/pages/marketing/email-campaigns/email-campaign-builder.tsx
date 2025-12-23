@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { fetchLists } from "@/features/dashboard/pages/lists/services/list-api";
 import { addListsToCampaign } from "@/features/dashboard/pages/campaigns/services/campaign-api";
@@ -14,9 +14,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, ArrowRight, CheckCircle2, AlertCircle, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { EmailEditorWrapper, EmailEditorRef } from "./components/email-editor-wrapper";
+import { CampaignLinksPanel, CampaignLink } from "./components/campaign-links-panel";
+import { LinkLabelsDialog } from "./components/link-labels-dialog";
+import { extractLinksAndButtons, transformUnlayerToBlocks } from "./utils/transform-unlayer-design";
+import { LinkItem } from "./types/block-types";
+
 
 interface EmailCampaignBuilderProps {
     campaignId: string;
@@ -34,6 +40,18 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
     // Setup step fields
     const [subject, setSubject] = useState("");
     const [preheader, setPreheader] = useState("");
+
+    // Design step fields
+    const emailEditorRef = useRef<EmailEditorRef>(null);
+    const [emailDesign, setEmailDesign] = useState<any>(null);
+    const [emailHtml, setEmailHtml] = useState<string>("");
+    const [isSavingDesign, setIsSavingDesign] = useState(false);
+    const [trackedLinks, setTrackedLinks] = useState<CampaignLink[]>([]);
+
+    // Link labels dialog state
+    const [showLinkLabelsDialog, setShowLinkLabelsDialog] = useState(false);
+    const [extractedLinks, setExtractedLinks] = useState<LinkItem[]>([]);
+    const [pendingDesign, setPendingDesign] = useState<{ design: any; html: string } | null>(null);
 
     useEffect(() => {
         const loadLists = async () => {
@@ -128,8 +146,166 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
             } finally {
                 setIsSubmitting(false);
             }
+        } else if (currentStep === 3) {
+            // Design step - export and save the email design
+            await handleSaveDesign();
         } else {
             setCurrentStep(prev => prev + 1);
+        }
+    };
+
+    const handleSaveDesign = async () => {
+        try {
+            setIsSavingDesign(true);
+            setError(null);
+
+            // Export the design from the email editor
+            if (!emailEditorRef.current) {
+                throw new Error("Email editor not initialized");
+            }
+
+            // Get the HTML and design JSON from the editor
+            const exportPromise = new Promise((resolve, reject) => {
+                if (!emailEditorRef.current) {
+                    reject(new Error("Email editor not initialized"));
+                    return;
+                }
+                emailEditorRef.current.exportHtml((data: any) => {
+                    const { design, html } = data;
+                    resolve({ design, html });
+                });
+            });
+
+            const { design, html } = await exportPromise as { design: any; html: string };
+
+            // Save the design and HTML to state
+            setEmailDesign(design);
+            setEmailHtml(html);
+
+            // Extract links and buttons from HTML
+            const links = extractLinksAndButtons(html);
+
+            if (links.length > 0) {
+                // Show dialog to collect link labels
+                setExtractedLinks(links);
+                setPendingDesign({ design, html });
+                setShowLinkLabelsDialog(true);
+            } else {
+                // No links, save directly
+                await saveDesignToWebhook(design, html, new Map());
+            }
+        } catch (err) {
+            console.error("Error saving email design:", err);
+            const errorMessage = err instanceof Error ? err.message : "Failed to save design. Please try again.";
+            toast.error(errorMessage);
+            setError(errorMessage);
+        } finally {
+            setIsSavingDesign(false);
+        }
+    };
+
+    const handleLinkLabelsSave = async (linkLabels: Map<string, string>) => {
+        setShowLinkLabelsDialog(false);
+
+        if (!pendingDesign) return;
+
+        try {
+            setIsSavingDesign(true);
+            await saveDesignToWebhook(pendingDesign.design, pendingDesign.html, linkLabels);
+        } finally {
+            setPendingDesign(null);
+            setIsSavingDesign(false);
+        }
+    };
+
+    const handleLinkLabelsCancel = () => {
+        setShowLinkLabelsDialog(false);
+        setPendingDesign(null);
+        setIsSavingDesign(false);
+    };
+
+    const saveDesignToWebhook = async (design: any, html: string, linkLabels: Map<string, string>) => {
+        try {
+            // Transform to custom block structure
+            const blocks = transformUnlayerToBlocks(design, html, campaignId, linkLabels);
+
+            // Send to webhook with custom block structure
+            const payload = {
+                campaign_id: campaignId,
+                content_json: { blocks },
+                rendered_html: html,
+            };
+
+            // Log the payload structure for review
+            console.log('=== EMAIL CAMPAIGN PAYLOAD ===');
+            console.log('Campaign ID:', payload.campaign_id);
+            console.log('Blocks Count:', blocks.length);
+            console.log('\n--- BLOCKS STRUCTURE ---');
+            blocks.forEach((block, index) => {
+                console.log(`\nBlock ${index + 1}:`, block);
+            });
+            console.log('\n--- FULL PAYLOAD (JSON) ---');
+            console.log(JSON.stringify(payload, null, 2));
+            console.log('\n--- HTML LENGTH ---');
+            console.log(`${html.length} characters`);
+            console.log('==============================\n');
+
+            // WEBHOOK DISABLED FOR TESTING
+            // Uncomment when ready to send to backend
+            /*
+            const response = await fetch('https://workflows.agilecyber.com/webhook/Campaign-Builder-design', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                let errorMessage = 'Failed to save design';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorData.error || errorMessage;
+                } catch {
+                    errorMessage = response.statusText || errorMessage;
+                }
+
+                console.error(`Design save failed with status ${response.status}:`, errorMessage);
+                toast.error(errorMessage);
+                setError(errorMessage);
+                return;
+            }
+
+            // Parse response to get tracked links
+            try {
+                const responseData = await response.json();
+                if (responseData.links && Array.isArray(responseData.links)) {
+                    setTrackedLinks(responseData.links);
+                    console.log(`${responseData.links.length} links tracked`);
+                }
+            } catch (e) {
+                console.warn('No links data in response');
+            }
+            */
+
+            toast.success("Email design saved successfully (webhook disabled for testing)");
+            toast.info("Check browser console for payload structure");
+
+            // Move to next step
+            setCurrentStep(prev => prev + 1);
+        } catch (err) {
+            console.error("Error sending design to webhook:", err);
+            const errorMessage = err instanceof Error ? err.message : "Failed to save design. Please try again.";
+            toast.error(errorMessage);
+            throw err;
+        }
+    };
+
+    const onEditorLoad = () => {
+        console.log('Email editor loaded successfully');
+        // If we have a saved design, load it
+        if (emailDesign && emailEditorRef.current) {
+            emailEditorRef.current.loadDesign(emailDesign);
         }
     };
 
@@ -299,13 +475,67 @@ export function EmailCampaignBuilder({ campaignId }: EmailCampaignBuilderProps) 
                     </Card>
                 )}
 
-                {currentStep > 2 && (
+                {currentStep === 3 && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Design Your Email</CardTitle>
+                            <CardDescription>
+                                Use the drag-and-drop editor to create your email template.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="border rounded-lg overflow-hidden" style={{ height: '700px' }}>
+                                <EmailEditorWrapper
+                                    ref={emailEditorRef}
+                                    onLoad={onEditorLoad}
+                                />
+                            </div>
+
+                            {trackedLinks.length > 0 && (
+                                <CampaignLinksPanel links={trackedLinks} campaignId={campaignId} />
+                            )}
+
+                            {error && currentStep === 3 && (
+                                <Alert variant="destructive" className="mt-4">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            )}
+                        </CardContent>
+                        <CardFooter className="flex justify-between border-t p-6">
+                            <Button variant="outline" onClick={() => setCurrentStep(2)} disabled={isSavingDesign}>
+                                Back
+                            </Button>
+                            <div className="flex gap-2">
+                                <Button variant="outline" onClick={handleSaveDesign} disabled={isSavingDesign}>
+                                    {isSavingDesign && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Save Draft
+                                </Button>
+                                <Button onClick={handleNext} disabled={isSavingDesign}>
+                                    {isSavingDesign && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardFooter>
+                    </Card>
+                )}
+
+                {currentStep > 3 && (
                     <div className="flex flex-col items-center justify-center py-12 border rounded-lg border-dashed">
-                        <p className="text-muted-foreground">Next steps coming soon...</p>
-                        <Button variant="outline" className="mt-4" onClick={() => setCurrentStep(2)}>Back to Setup</Button>
+                        <p className="text-muted-foreground">Review step coming soon...</p>
+                        <Button variant="outline" className="mt-4" onClick={() => setCurrentStep(3)}>Back to Design</Button>
                     </div>
                 )}
             </div>
+
+            {/* Link Labels Dialog */}
+            <LinkLabelsDialog
+                open={showLinkLabelsDialog}
+                links={extractedLinks}
+                onSave={handleLinkLabelsSave}
+                onCancel={handleLinkLabelsCancel}
+            />
         </div>
     );
 }
